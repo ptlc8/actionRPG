@@ -6,7 +6,10 @@ import static org.lwjgl.opengl.GL11.*;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.opengl.GL11;
+
+import fr.actionrpg3d.math.Vector3f;
+import fr.actionrpg3d.render.Camera;
 
 public class Main {
 	
@@ -20,8 +23,11 @@ public class Main {
 			Display.setResizable(true);
 			Display.create();
 			
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE); // X-ray ?
 			
-			int FRAME_CAP = 500;
+			
+			int FRAME_CAP = 60;
 			long lastUpdate = System.nanoTime();
 			long lastRender = System.nanoTime();
 			double updateTime = 1_000_000_000.0 / 60.0; // TPS
@@ -33,7 +39,8 @@ public class Main {
 				boolean rendered = false;
 				if (Display.isCloseRequested()) running = false;
 				if (System.nanoTime() - lastUpdate > updateTime) {
-					update();
+					update(camera);
+					Display.update();
 					ticks++;
 					lastUpdate += updateTime;
 				}
@@ -66,7 +73,10 @@ public class Main {
 	}
 	
 	private static void render(Camera camera) {
+		if (Display.wasResized()) glViewport(0, 0, Display.getWidth(), Display.getHeight());
+		GL11.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		camera.getPerspectiveProjection();
+		camera.render();
 		
 		glBegin(GL_QUADS);
 		glColor3f(1, .5f, 0);
@@ -80,8 +90,8 @@ public class Main {
 		glEnd();
 	}
 	
-	private static void update() {
-		Display.update();
+	private static void update(Camera camera) {
+		camera.freeCamMove();
 		// plein de choses !!!
 	}
 	
