@@ -12,6 +12,20 @@ public class DungeonGenerator {
 		return x - Math.floor(x);
 	}
 	
+	/**
+	 * Cette fonction permet de générer de façon procédurale un donjon (ou étage de donjon),
+	 * elle génère des salles (-1) selon les arguments donnés et les relient grâce à des couloirs (-2),
+	 * ces deux derniers sont séparés par des portes (-3), le reste constitue des murs (1)
+	 * @author PTLC_ / Kévin
+	 * @param width La longueur du donjon
+	 * @param height La largeur du donjon
+	 * @param roomsNMin Le nombre de salle minimum, il peut être ignoré si la largeur et la hauteur son trop petits
+	 * @param roomsNMax Le nombre de salle maximum
+	 * @param roomSizeMin La taille minimale d'une salle
+	 * @param roomSizeMax La taille maximale d'une salle
+	 * @param seed_ La graine de génération du donjon, une même graine et des même paramètres donneront le même donjon
+	 * @return Un tableau d'entiers à deux dimensions. 1 représente un mur, -1 une salle, -2 un couloir et -3 une porte
+	 */
 	public static int[][] generate(int width, int height, int roomsNMin, int roomsNMax, int roomSizeMin, int roomSizeMax, int seed_) {
 		/*if (seed_ != null)*/ seed = seed_;
 		int[][] pattern = new int[height][width];
