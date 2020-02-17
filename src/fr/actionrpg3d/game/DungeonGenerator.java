@@ -58,9 +58,7 @@ public class DungeonGenerator {
 		for (int i = 0; i < rooms.size(); i++)
 			for (int j = i+1; j < rooms.size(); j++)
 				roomsPeers.add(new RoomPeer(rooms.get(i), rooms.get(j)));
-		//console.log(r = roomsPeers);
 		roomsPeers.sort((p1, p2) -> (p1.dx+p1.dy)-(p2.dx+p2.dy));
-		//console.log(roomsPeers);
 		for (Room room : rooms) {
 			RoomPeer peer = null;
 			for (RoomPeer p : roomsPeers)

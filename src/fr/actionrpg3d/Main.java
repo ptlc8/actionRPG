@@ -8,6 +8,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
+import fr.actionrpg3d.game.DungeonGenerator;
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Camera;
 
@@ -34,6 +35,8 @@ public class Main {
 			double renderTime = 1_000_000_000.0 / FRAME_CAP;
 			int ticks = 0, frames = 0;
 			long timer = System.currentTimeMillis();
+			
+			onStart();
 			
 			while (running) {
 				boolean rendered = false;
@@ -72,11 +75,30 @@ public class Main {
 		}
 	}
 	
+	private static int[][] map;
+	
+	private static void onStart() {
+		map = DungeonGenerator.generate(101, 101, 8, 15, 7, 51, 0);
+	}
+	
 	private static void render(Camera camera) {
 		if (Display.wasResized()) glViewport(0, 0, Display.getWidth(), Display.getHeight());
 		GL11.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		camera.getPerspectiveProjection();
 		camera.render();
+		
+		for(int i = 0; i < map.length; i++) {
+			for (int j = 0; j < map[i].length; j++) {
+				if (map[i][j] > 0) continue;
+				glBegin(GL_QUADS);
+				glColor3f(1, 1, 1);
+				glVertex3f(j, 0f, i+1);
+				glVertex3f(j+1, 0f, i+1);
+				glVertex3f(j+1, 0f, i);
+				glVertex3f(j, 0f, i);
+				glEnd();
+			}
+		}
 		
 		glBegin(GL_QUADS);
 		glColor3f(1, .5f, 0);
