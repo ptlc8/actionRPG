@@ -45,7 +45,7 @@ public class Camera {
 		glPopMatrix();						// inutile ?
 	}
 	
-	private float speed = .1f;
+	private float speed = .2f;
 	
 	public void freeCamMove() {
 		if (Mouse.isButtonDown(0)) {
@@ -85,3 +85,4 @@ public class Camera {
 	}
 	
 }
+	
