@@ -78,7 +78,7 @@ public class Main {
 	private static int[][] map;
 	
 	private static void onStart() {
-		map = DungeonGenerator.generate(101, 101, 8, 15, 7, 51, 0);
+		map = DungeonGenerator.generate(101, 101, 8, 15, 7, 51, 1);
 	}
 	
 	private static void render(Camera camera) {
@@ -126,7 +126,8 @@ public class Main {
 	private enum Direction {NORTH, SOUTH, EAST, WEST}
 	private static void renderWall(int x, int z, Direction d) {
 		glBegin(GL_QUADS);
-		glColor3f(.8f, .8f, .8f);
+		if (d==Direction.NORTH||d==Direction.SOUTH) glColor3f(.9f, .9f, .9f);
+		else glColor3f(.8f, .8f, .8f);
 		glVertex3f(x+(d==Direction.SOUTH||d==Direction.EAST?.5f:-.5f), 0f, z+(d==Direction.NORTH||d==Direction.EAST?.5f:-.5f));
 		glVertex3f(x+(d==Direction.SOUTH||d==Direction.EAST?.5f:-.5f), 1f, z+(d==Direction.NORTH||d==Direction.EAST?.5f:-.5f));
 		glVertex3f(x+(d==Direction.NORTH||d==Direction.EAST?.5f:-.5f), 1f, z+(d==Direction.NORTH||d==Direction.WEST?.5f:-.5f));
