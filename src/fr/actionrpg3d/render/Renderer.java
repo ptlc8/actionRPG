@@ -13,7 +13,7 @@ public class Renderer {
 		
 		for (Entity entity : game.getEntities()) {
 			if (entity instanceof Modelizable)
-				render(((Modelizable)entity).getModel(), entity.getPosition().getX(), entity.getPosition().getY(), entity.getPosition().getZ());
+				render(((Modelizable)entity).getModel(), entity.getPosition(), ((Modelizable)entity).getRotation());
 		}
 		
 		// TODO : temporaire 
@@ -43,11 +43,13 @@ public class Renderer {
 		}
 	}
 	
-	private static void render(Model model, float x, float y, float z) {
+	private static void render(Model model, Vector3f pos, Vector3f rot) {
 		for (Shape shape : model.getShapes()) {
 			glBegin(GL_POLYGON);
 			for (Vector3f vertex : shape.getVectors()) {
-				glVertex3f(x+vertex.getX(), y+vertex.getY(), z+vertex.getZ());
+				Vector3f v = new Vector3f(vertex).rotate(rot);
+				glColor3f(1, 1, 1);
+				glVertex3f(pos.getX()+v.getX(), pos.getY()+v.getY(), pos.getZ()+v.getZ());
 			}
 			glEnd();
 		}

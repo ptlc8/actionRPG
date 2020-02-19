@@ -54,10 +54,31 @@ public class Vector3f {
 		return this;
 	}
 	
+	public Vector3f mul(float f) {
+		this.x *= f;
+		this.y *= f;
+		this.z *= f;
+		return this;
+	}
+	
 	public Vector3f div(Vector3f v) {
 		this.x /= v.x;
 		this.y /= v.y;
 		this.z /= v.z;
+		return this;
+	}
+	
+	public Vector3f rotate(Vector3f rot) {
+		// https://en.wikipedia.org/wiki/Rotation_matrix
+		Vector3f v = new Vector3f(this);
+		float cosRx = (float)Math.cos(rot.x), cosRy = (float)Math.cos(rot.y), cosRz = (float)Math.cos(rot.z);
+		float sinRx = (float)Math.sin(rot.x), sinRy = (float)Math.sin(rot.y), sinRz = (float)Math.sin(rot.z);
+		v.setX(cosRz*cosRy*x+(cosRz*sinRy*sinRx-sinRz*cosRx)*y+(cosRz*sinRy*cosRx+sinRz*sinRx)*z);
+		v.setY(sinRz*cosRy*x+(sinRz*sinRy*sinRx+cosRz*cosRx)*y+(sinRz*sinRy*cosRx-cosRz*sinRx)*z);
+		v.setZ(-sinRy*x+cosRy*sinRx*y+cosRy*cosRx*z);
+		setX(v.x);
+		setY(v.y);
+		setZ(v.z);
 		return this;
 	}
 	
@@ -67,8 +88,9 @@ public class Vector3f {
 		return x;
 	}
 
-	public void setX(float x) {
+	public Vector3f setX(float x) {
 		this.x = x;
+		return this;
 	}
 	
 	public Vector3f addX(float x) {
@@ -87,8 +109,9 @@ public class Vector3f {
 		return y;
 	}
 
-	public void setY(float y) {
+	public Vector3f setY(float y) {
 		this.y = y;
+		return this;
 	}
 	
 	public Vector3f addY(float y) {
@@ -107,8 +130,9 @@ public class Vector3f {
 		return z;
 	}
 
-	public void setZ(float z) {
+	public Vector3f setZ(float z) {
 		this.z = z;
+		return this;
 	}
 	
 	public Vector3f addZ(float z) {
