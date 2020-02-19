@@ -45,10 +45,10 @@ public class Renderer {
 	
 	private static void render(Model model, Vector3f pos, Vector3f rot) {
 		for (Shape shape : model.getShapes()) {
+			glColor3f(shape.getColor().getX(), shape.getColor().getY(), shape.getColor().getZ());
 			glBegin(GL_POLYGON);
 			for (Vector3f vertex : shape.getVectors()) {
 				Vector3f v = new Vector3f(vertex).rotate(rot);
-				glColor3f(1, 1, 1);
 				glVertex3f(pos.getX()+v.getX(), pos.getY()+v.getY(), pos.getZ()+v.getZ());
 			}
 			glEnd();
