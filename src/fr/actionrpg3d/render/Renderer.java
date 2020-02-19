@@ -3,6 +3,8 @@ package fr.actionrpg3d.render;
 import static org.lwjgl.opengl.GL11.*;
 import fr.actionrpg3d.game.Entity;
 import fr.actionrpg3d.game.Game;
+import fr.actionrpg3d.math.Vector3f;
+import fr.actionrpg3d.render.Model.Shape;
 
 public class Renderer {
 	
@@ -41,6 +43,16 @@ public class Renderer {
 					if (j>=(map.length==0?0:map[0].length-1) || map[i][j+1] > 0) renderWall(j, i, Direction.EAST);
 				}
 			}
+		}
+	}
+	
+	private static void render(Model model, float x, float y, float z) {
+		for (Shape shape : model.getShapes()) {
+			glBegin(GL_POLYGON);
+			for (Vector3f vertex : shape.getVectors()) {
+				glVertex3f(x+vertex.getX(), y+vertex.getY(), z+vertex.getZ());
+			}
+			glEnd();
 		}
 	}
 	
