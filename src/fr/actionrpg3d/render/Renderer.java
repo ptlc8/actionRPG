@@ -3,6 +3,7 @@ package fr.actionrpg3d.render;
 import static org.lwjgl.opengl.GL11.*;
 import fr.actionrpg3d.game.Entity;
 import fr.actionrpg3d.game.Game;
+import fr.actionrpg3d.game.Modelizable;
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Model.Shape;
 
@@ -11,12 +12,8 @@ public class Renderer {
 	public static void render(Game game) {
 		
 		for (Entity entity : game.getEntities()) {
-			glBegin(GL_TRIANGLES);	// TODO : les entités sont actuellement signalées par des triangles rouges
-			glColor3f(1, 0, 0);
-			glVertex3f(entity.getPosition().getX()+1, .1f, entity.getPosition().getZ());
-			glVertex3f(entity.getPosition().getX()-.7f, .1f, entity.getPosition().getZ()-.9f);
-			glVertex3f(entity.getPosition().getX()-.7f, .1f, entity.getPosition().getZ()+.9f);
-			glEnd();
+			if (entity instanceof Modelizable)
+				render(((Modelizable)entity).getModel(), entity.getPosition().getX(), entity.getPosition().getY(), entity.getPosition().getZ());
 		}
 		
 		// TODO : temporaire 
