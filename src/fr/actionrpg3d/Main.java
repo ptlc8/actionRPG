@@ -14,7 +14,10 @@ import org.lwjgl.opengl.GL11;
 import fr.actionrpg3d.game.Game;
 import fr.actionrpg3d.render.Camera;
 import fr.actionrpg3d.render.FirstPersonCamera;
+import fr.actionrpg3d.render.FreeCamera;
+import fr.actionrpg3d.render.ThirdPersonCamera;
 import fr.actionrpg3d.render.Renderer;
+import fr.actionrpg3d.math.Vector3f;
 
 public class Main {
 	
@@ -28,9 +31,8 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		System.out.println("\"actionrpg3d\" " + VERSION + ", par PTLC_, le " + DATE + ", pour tous, vive l'Amour !");
-		
 		System.setProperty("org.lwjgl.librarypath", new File("native/"+getOS()).getAbsolutePath());
+		System.out.println("\"actionrpg3d\" " + VERSION + ", par PTLC_, le " + DATE + ", pour tous, vive l'Amour !");
 		
 		try {
 			Display.setDisplayMode(new DisplayMode(720, 480));
