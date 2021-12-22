@@ -41,9 +41,10 @@ public class Vector3f {
 	}
 	
 	public Vector3f normalize() {
-		this.x /= length();
-		this.y /= length();
-		this.z /= length();
+		float l = length();
+		this.x /= l;
+		this.y /= l;
+		this.z /= l;
 		return this;
 	}
 	
@@ -174,6 +175,11 @@ public class Vector3f {
 	public Vector3f subZ(float z) {
 		this.z -= z;
 		return this;
+	}
+	
+	@Override
+	public String toString() {
+		return "("+x+","+y+","+z+")";
 	}
 	
 }
