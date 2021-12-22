@@ -1,5 +1,8 @@
 package fr.actionrpg3d;
 
+
+import java.io.File;
+
 import org.lwjgl.LWJGLException;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -21,6 +24,8 @@ public class Main {
 	private static Game game;
 	
 	public static void main(String[] args) {
+		
+		System.setProperty("org.lwjgl.librarypath", new File("native/linux").getAbsolutePath());
 		try {
 			Display.setDisplayMode(new DisplayMode(720, 480));
 			Display.setTitle("ActionRPG3D");
