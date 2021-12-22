@@ -30,7 +30,8 @@ public class Main {
 		
 		System.out.println("\"actionrpg3d\" " + VERSION + ", par PTLC_, le " + DATE + ", pour tous, vive l'Amour !");
 		
-		System.setProperty("org.lwjgl.librarypath", new File("lib/native/windows").getAbsolutePath());
+		System.setProperty("org.lwjgl.librarypath", new File("native/windows").getAbsolutePath());
+		
 		try {
 			Display.setDisplayMode(new DisplayMode(720, 480));
 			Display.setTitle("ActionRPG3D");
