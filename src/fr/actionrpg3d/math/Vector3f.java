@@ -22,6 +22,20 @@ public class Vector3f {
 		this.z = z;
 	}
 	
+	public Vector3f set(Vector3f v) {
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
+		return this;
+	}
+	
+	public Vector3f set(float x, float y,  float z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		return this;
+	}
+	
 	public float length() {
 		return (float)Math.sqrt(x*x + y*y + z*z);
 	}
@@ -71,8 +85,8 @@ public class Vector3f {
 	public Vector3f rotate(Vector3f rot) {
 		// https://en.wikipedia.org/wiki/Rotation_matrix
 		Vector3f v = new Vector3f(this);
-		float cosRx = (float)Math.cos(rot.x), cosRy = (float)Math.cos(rot.y), cosRz = (float)Math.cos(rot.z);
-		float sinRx = (float)Math.sin(rot.x), sinRy = (float)Math.sin(rot.y), sinRz = (float)Math.sin(rot.z);
+		float cosRx = (float)Math.cos(Math.toRadians(rot.x)), cosRy = (float)Math.cos(Math.toRadians(rot.y)), cosRz = (float)Math.cos(Math.toRadians(rot.z));
+		float sinRx = (float)Math.sin(Math.toRadians(rot.x)), sinRy = (float)Math.sin(Math.toRadians(rot.y)), sinRz = (float)Math.sin(Math.toRadians(rot.z));
 		v.setX(cosRz*cosRy*x+(cosRz*sinRy*sinRx-sinRz*cosRx)*y+(cosRz*sinRy*cosRx+sinRz*sinRx)*z);
 		v.setY(sinRz*cosRy*x+(sinRz*sinRy*sinRx+cosRz*cosRx)*y+(sinRz*sinRy*cosRx-cosRz*sinRx)*z);
 		v.setZ(-sinRy*x+cosRy*sinRx*y+cosRy*cosRx*z);
@@ -80,6 +94,18 @@ public class Vector3f {
 		setY(v.y);
 		setZ(v.z);
 		return this;
+	}
+	
+	public boolean isZero() {
+		return x == 0 && y == 0 && z == 0;
+	}
+	
+	public Vector2f getVector2fFromXZ() {
+		return new Vector2f(x, z);
+	}
+	
+	public Vector3f clone() {
+		return new Vector3f(x, y, z);
 	}
 	
 	// ---- X
@@ -121,6 +147,11 @@ public class Vector3f {
 	
 	public Vector3f subY(float y) {
 		this.y -= y;
+		return this;
+	}
+	
+	public Vector3f mulY(float y) {
+		this.y *= y;
 		return this;
 	}
 	

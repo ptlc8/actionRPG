@@ -2,14 +2,12 @@ package fr.actionrpg3d.render;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.glu.GLU;
 
 import fr.actionrpg3d.math.Vector3f;
 
-public class Camera {
+public abstract class Camera {
 	
 	private Vector3f pos;
 	private Vector3f rotation;
@@ -31,7 +29,6 @@ public class Camera {
 	
 	public void getPerspectiveProjection() {
 		glEnable(GL_PROJECTION);
-		glLoadIdentity();
 		GLU.gluPerspective(fov, (float)Display.getWidth()/(float)Display.getHeight(), near, far);
 		glEnable(GL_MODELVIEW);
 	}
@@ -45,43 +42,18 @@ public class Camera {
 		glPopMatrix();						// inutile ?
 	}
 	
-	private float speed = .2f;
-	
-	public void freeCamMove() {
-		if (Mouse.isButtonDown(0)) {
-			rotation.addX(-Mouse.getDY());
-			rotation.addY(Mouse.getDX());
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_Z)) {
-			pos.addZ((float)(speed*Math.cos(Math.toRadians(rotation.getY()))));
-			pos.addX((float)(-speed*Math.sin(Math.toRadians(rotation.getY()))));
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-			pos.addZ((float)(-speed*Math.cos(Math.toRadians(rotation.getY()))));
-			pos.addX((float)(speed*Math.sin(Math.toRadians(rotation.getY()))));
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
-			pos.addX((float)(speed*Math.cos(Math.toRadians(rotation.getY()))));
-			pos.addZ((float)(speed*Math.sin(Math.toRadians(rotation.getY()))));
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-			pos.addX((float)(-speed*Math.cos(Math.toRadians(rotation.getY()))));
-			pos.addZ((float)(-speed*Math.sin(Math.toRadians(rotation.getY()))));
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-			pos.addY(-speed);
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-			pos.addY(speed);
-		}
-	}
+	public abstract void update();
 
-	public Vector3f getPos() {
+	public Vector3f getPosition() {
 		return pos;
 	}
 
-	public void setPos(Vector3f pos) {
+	public void setPosition(Vector3f pos) {
 		this.pos = pos;
+	}
+	
+	public Vector3f getRotation() {
+		return rotation;
 	}
 	
 }

@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import fr.actionrpg3d.math.Vector3f;
 
 public class Model {
+	
+	// TODO : private static HashMap<String, Model> models;
 	
 	private List<Shape> shapes;
 	
@@ -37,10 +40,12 @@ public class Model {
 					String[] kolors = line.replaceFirst("@c", "").trim().split(" ");
 					kolor = new Vector3f(Float.parseFloat(kolors[0]), Float.parseFloat(kolors[1]), Float.parseFloat(kolors[2]));
 				} else {
-					String[] coords = line.split(" ");
-					Vector3f[] vectors = new Vector3f[coords.length/3];
-					for (int i = 0; i < coords.length/3; i++) {
-						vectors[i] = new Vector3f(Float.parseFloat(coords[i*3]), Float.parseFloat(coords[i*3+1]), Float.parseFloat(coords[i*3+2]));
+					List<String> coords = new ArrayList<>();
+					coords.addAll(Arrays.asList(line.split(" ")));
+					coords.removeIf(c -> c.equals(""));
+					Vector3f[] vectors = new Vector3f[coords.size()/3];
+					for (int i = 0; i < coords.size()/3; i++) {
+						vectors[i] = new Vector3f(Float.parseFloat(coords.get(i*3)), Float.parseFloat(coords.get(i*3+1)), Float.parseFloat(coords.get(i*3+2)));
 					}
 					shapes.add(new Shape(kolor, vectors));
 				}

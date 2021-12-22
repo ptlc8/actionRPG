@@ -1,4 +1,4 @@
-package fr.actionrpg3d.game;
+package fr.actionrpg3d.game.entities;
 
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Model;

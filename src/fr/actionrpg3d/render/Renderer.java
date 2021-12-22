@@ -1,44 +1,92 @@
 package fr.actionrpg3d.render;
 
 import static org.lwjgl.opengl.GL11.*;
-import fr.actionrpg3d.game.Entity;
+
+import org.lwjgl.opengl.Display;
+
+import fr.actionrpg3d.game.Dungeon;
 import fr.actionrpg3d.game.Game;
-import fr.actionrpg3d.game.Modelizable;
+import fr.actionrpg3d.game.entities.Creature;
+import fr.actionrpg3d.game.entities.Entity;
+import fr.actionrpg3d.game.entities.Modelizable;
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Model.Shape;
 
 public class Renderer {
 	
+	public static void renderGUI(Game game, Camera camera) {
+		float aspect = (float)Display.getWidth()/(float)Display.getHeight();
+		if (camera instanceof FirstPersonCamera || camera instanceof ThirdPersonCamera) {
+			Creature creature = camera instanceof FirstPersonCamera ? ((FirstPersonCamera)camera).getFollowed() : ((ThirdPersonCamera)camera).getFollowed();
+			float health = (float) creature.getHealth() / creature.getMaxHealth();
+			renderPlayerHealth(health, aspect);
+			/*if (creature instanceof Player) {
+				float cooldown = (float) ((Player)creature).getCooldown() / ((Player)creature).getWeapon().getCooldown();
+				renderPlayerCooldown(cooldown, aspect);
+			}*/
+			glColor3f(.7f, .7f, .7f); // blanc cassé
+			glBegin(GL_LINES);
+			glVertex2f(-.02f, 0);
+			glVertex2f(.02f, 0);
+			glEnd();
+			glBegin(GL_LINES);
+			glVertex2f(0, -.02f*aspect);
+			glVertex2f(0, .02f*aspect);
+			glEnd();
+		}
+	}
+	
+	private static void renderPlayerHealth(float health, float aspect) {
+		glColor3f(.8f, .2f, .2f); // rouge
+		glBegin(GL_QUADS);
+		glVertex2f(-.95f, -.85f);
+		glVertex2f(-.95f, -.95f);
+		glVertex2f(-.95f+.675f*health, -.95f);
+		glVertex2f(-.95f+.625f*health, -.85f);
+		glEnd();
+		glColor3f(.7f, .7f, .7f); // blanc cassé
+		glBegin(GL_QUADS);
+		glVertex2f(-1, -.8f);
+		glVertex2f(-1, -1);
+		glVertex2f(-.2f, -1);
+		glVertex2f(-.3f, -.8f);
+		glEnd();
+	}
+	
+	/*private static void renderPlayerCooldown(float cooldown, float aspect) {
+		glColor3f(.7f, .7f, .1f); // jaune
+		glBegin(GL_QUADS);
+		glVertex2f(.95f, -.975f);
+		glVertex2f(.95f, -.875f);
+		glVertex2f(.95f-.625f*cooldown, -.875f);
+		glVertex2f(.95f-.675f*cooldown, -.975f);
+		glEnd();
+		glColor3f(.7f, .7f, .7f); // blanc cassé
+		glBegin(GL_QUADS);
+		glVertex2f(1, -1);
+		glVertex2f(1, -.85f);
+		glVertex2f(.3f, -.85f);
+		glVertex2f(.2f, -1);
+		glEnd();
+	}*/
+	
 	public static void render(Game game) {
 		
 		for (Entity entity : game.getEntities()) {
-			if (entity instanceof Modelizable)
-				render(((Modelizable)entity).getModel(), entity.getPosition(), ((Modelizable)entity).getRotation());
-		}
+			if (entity instanceof Modelizable) {
+				if (!(game.getCamera() instanceof FirstPersonCamera && ((FirstPersonCamera)game.getCamera()).getFollowed()==entity))
+					render(((Modelizable)entity).getModel(), entity.getPosition(), ((Modelizable)entity).getRotation());
+				/*if (entity instanceof Player && ((Player)entity).getWeapon()!=null) {
+					Player player = (Player)entity;
+					render(player.getWeapon().getModel(), player.getPosition().clone().add(player.getHandPosition()), player.getRotation().clone().setX(0).setZ(0));
+				}*/
+			}
+		}		
 		
-		// TODO : temporaire 
-		glBegin(GL_QUADS);
-		glColor3f(1, .5f, 0);
-		glVertex3f(-1, -.5f, -0);
-		glColor3f(1, 0f, 0);
-		glVertex3f(1, -.5f, -0);
-		glColor3f(1, .5f, 1);
-		glVertex3f(1, -.5f, -10);
-		glColor3f(0, .5f, 0);
-		glVertex3f(-1, -.5f, -10);
-		glEnd();
-		
-		
-		int [][] map = game.getMap();
+		int [][] map = game.getDungeon().getPattern();
 		for(int i = 0; i < map.length; i++) {
 			for (int j = 0; j < map[i].length; j++) {
-				if (map[i][j] < 0) {
-					renderFloor(j, i);
-					if (i<=0 || map[i-1][j] > 0) renderWall(j, i, Direction.SOUTH);
-					if (i>=map.length-1 || map[i+1][j] > 0) renderWall(j, i, Direction.NORTH);
-					if (j<=0 || map[i][j-1] > 0) renderWall(j, i, Direction.WEST);
-					if (j>=(map.length==0?0:map[0].length-1) || map[i][j+1] > 0) renderWall(j, i, Direction.EAST);
-				}
+				renderTile(j, i, map[i][j], i>=map.length-1?0:map[i+1][j], j>=(map.length==0?0:map[0].length-1)?0:map[i][j+1], i<=0?0:map[i-1][j], j<=0?0:map[i][j-1]);
 			}
 		}
 	}
@@ -55,27 +103,57 @@ public class Renderer {
 		}
 	}
 	
+	private static void renderTile(int x, int z, int tile, int north, int east, int south, int west) {
+		if (tile != Dungeon.WALL) {
+			renderFloor(x, z);
+			if (north==Dungeon.WALL) renderWall(x, z, Direction.NORTH);
+			if (east==Dungeon.WALL) renderWall(x, z, Direction.EAST);
+			if (south==Dungeon.WALL) renderWall(x, z, Direction.SOUTH);
+			if (west==Dungeon.WALL) renderWall(x, z, Direction.WEST);
+		}
+		switch (tile) {
+		case Dungeon.CHEST:
+			render(treasure, new Vector3f(2*x, 0, 2*z), new Vector3f());
+			break;
+		case Dungeon.OPENABLE_DOOR:
+		case Dungeon.OPEN_DOOR:
+		case Dungeon.CLOSE_DOOR:
+			Vector3f position = new Vector3f(x*2, 0, z*2), rotation = new Vector3f();
+			if (tile == Dungeon.OPEN_DOOR) rotation.addY(90);
+			if (north == Dungeon.ROOM) render(door, position, rotation.clone().addY(-90));
+			if (east == Dungeon.ROOM) render(door, position, rotation.clone());
+			if (south == Dungeon.ROOM) render(door, position, rotation.clone().addY(90));
+			if (west == Dungeon.ROOM) render(door, position, rotation.clone().addY(180));
+			break;
+		}
+	}
+	
 	private static void renderFloor(int x, int z) {
 		glBegin(GL_QUADS);
-		glColor3f(1, 1, 1);
-		glVertex3f(x-.5f, 0f, z+.5f);
-		glVertex3f(x+.5f, 0f, z+.5f);
-		glVertex3f(x+.5f, 0f, z-.5f);
-		glVertex3f(x-.5f, 0f, z-.5f);
+		if ((x+z)%2==0) glColor3f(.8f, .8f, .8f);
+		else glColor3f(.7f, .7f, .7f);
+		glVertex3f(2*x-1f, 0f, 2*z+1f);
+		glVertex3f(2*x+1f, 0f, 2*z+1f);
+		glVertex3f(2*x+1f, 0f, 2*z-1f);
+		glVertex3f(2*x-1f, 0f, 2*z-1f);
 		glEnd();
 	}
-	
 	
 	private enum Direction {NORTH, SOUTH, EAST, WEST}
+	
 	private static void renderWall(int x, int z, Direction d) {
 		glBegin(GL_QUADS);
-		if (d==Direction.NORTH||d==Direction.SOUTH) glColor3f(.9f, .9f, .9f);
-		else glColor3f(.8f, .8f, .8f);
-		glVertex3f(x+(d==Direction.SOUTH||d==Direction.EAST?.5f:-.5f), 0f, z+(d==Direction.NORTH||d==Direction.EAST?.5f:-.5f));
-		glVertex3f(x+(d==Direction.SOUTH||d==Direction.EAST?.5f:-.5f), 1f, z+(d==Direction.NORTH||d==Direction.EAST?.5f:-.5f));
-		glVertex3f(x+(d==Direction.NORTH||d==Direction.EAST?.5f:-.5f), 1f, z+(d==Direction.NORTH||d==Direction.WEST?.5f:-.5f));
-		glVertex3f(x+(d==Direction.NORTH||d==Direction.EAST?.5f:-.5f), 0f, z+(d==Direction.NORTH||d==Direction.WEST?.5f:-.5f));
+		if (d==Direction.NORTH||d==Direction.SOUTH) glColor3f(.7f, .7f, .7f);
+		else glColor3f(.6f, .6f, .6f);
+		glVertex3f(2*x+(d==Direction.SOUTH||d==Direction.EAST?1f:-1f), 0f, 2*z+(d==Direction.NORTH||d==Direction.EAST?1f:-1f));
+		glVertex3f(2*x+(d==Direction.SOUTH||d==Direction.EAST?1f:-1f), 2f, 2*z+(d==Direction.NORTH||d==Direction.EAST?1f:-1f));
+		glVertex3f(2*x+(d==Direction.NORTH||d==Direction.EAST?1f:-1f), 2f, 2*z+(d==Direction.NORTH||d==Direction.WEST?1f:-1f));
+		glVertex3f(2*x+(d==Direction.NORTH||d==Direction.EAST?1f:-1f), 0f, 2*z+(d==Direction.NORTH||d==Direction.WEST?1f:-1f));
 		glEnd();
 	}
+	
+	private static Model door = new Model("/models/door.model");
+	
+	private static Model treasure = new Model("/models/chest.model"); // TODO : peu mieux faire
 	
 }
