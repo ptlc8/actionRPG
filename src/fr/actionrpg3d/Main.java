@@ -30,7 +30,7 @@ public class Main {
 		
 		System.out.println("\"actionrpg3d\" " + VERSION + ", par PTLC_, le " + DATE + ", pour tous, vive l'Amour !");
 		
-		System.setProperty("org.lwjgl.librarypath", new File("native/windows").getAbsolutePath());
+		System.setProperty("org.lwjgl.librarypath", new File("native/"+getOS()).getAbsolutePath());
 		
 		try {
 			Display.setDisplayMode(new DisplayMode(720, 480));
@@ -112,5 +112,19 @@ public class Main {
 		camera.update();
 		game.update();
 	}
+	
+	public static String getOS() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            return "windows";
+        } else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
+            return "linux";
+        } else if (os.contains("mac")) {
+            return "mac";
+        } else if (os.contains("sunos")) {
+            return "solaris";
+        }
+        return "unknow";
+    }
 	
 }
