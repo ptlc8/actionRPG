@@ -16,6 +16,7 @@ import fr.actionrpg3d.game.entities.Moveable;
 import fr.actionrpg3d.game.entities.Player;
 import fr.actionrpg3d.game.entities.Snowball;
 import fr.actionrpg3d.game.entities.Statue;
+import fr.actionrpg3d.game.entities.Wizard;
 import fr.actionrpg3d.math.Vector2f;
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Camera;
@@ -42,14 +43,12 @@ public class Game {
 		dungeon = DungeonGenerator.generate(seed, 101, 101, 16, 32, 7, 21, 0.4f);
 		// TODO : rien pour l'instant
 		Player player;
-		Vector2f startPoint = 
-				new Vector2f(-2, -4);
-				//dungeon.getStartPoint().mul(2);
+		Vector2f startPoint = dungeon.getStartPoint().mul(2); //new Vector2f(-2, -4);
 		entities.add(player = new Player(this, new Vector3f(startPoint.getX(), 1, startPoint.getY()), new Model("/models/robot.model")));
 		if (camera instanceof FirstPersonCamera) ((FirstPersonCamera)camera).setFollowed(player);
 		if (camera instanceof ThirdPersonCamera) ((ThirdPersonCamera)camera).setFollowed(player);
 		entities.add(new Snowball(this, new Vector3f(0, 5, 0), new Model("/models/cube.model")));
-		//entities.add(new Wizard(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
+		entities.add(new Wizard(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
 		entities.add(new Statue(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
 		Entity snowball = new Snowball(this, new Vector3f(5, 3, 10), new Model("/models/snowball.model"));
 		((Moveable)snowball).getAcceleration().set(-1, .5f, 0);

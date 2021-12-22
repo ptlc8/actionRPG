@@ -94,9 +94,10 @@ public class Main {
 	private static void onStart() {
 		Mouse.setCursorPosition(Display.getWidth()/2, Display.getHeight()/2);
 		Mouse.setGrabbed(true);
-		camera = new FirstPersonCamera(1.6f).setPerspectiveProjection(70f, 0.1f, 100f);
-		//camera = new ThirdPersonCamera(new Vector3f(0, 8, 0)).setPerspectiveProjection(70f, 0.1f, 100f);
-		//camera = new FreeCamera(new Vector3f(0, -5, 0)).setPerspectiveProjection(70f, 0.1f, 100f);
+		camera = new FirstPersonCamera(1.6f);
+		//camera = new ThirdPersonCamera(new Vector3f(0, 8, 0));
+		//camera = new FreeCamera(new Vector3f(0, -5, 0));
+		camera.setPerspectiveProjection(70f, 0.1f, 100f);
 		game = new Game(camera);
 	}
 	
