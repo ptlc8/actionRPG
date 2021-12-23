@@ -11,6 +11,7 @@ Vous vous retrouver dans un donjon composé de plusieurs salles mais aussi de pl
  - loup zombie
  - golem
  - liche
+
 Pour cela vous pouvez choisir une classe qui peut évoluer en fonction du temps :
  - guerrier
  - mage
