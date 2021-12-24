@@ -48,7 +48,8 @@ public abstract class Enemy extends Creature implements AI {
 			} else if (distanceNearestEntity < maxReach) {
 				goBack(nearestEntity);
 			} else {
-				attack(nearestEntity);
+				if (canAttack())
+					attack(nearestEntity);
 			}
 		}
 	}
@@ -68,9 +69,8 @@ public abstract class Enemy extends Creature implements AI {
 	void attack(Creature target) {
 		direction = (float) Math.atan2(target.getPosition().getX()-getPosition().getX(), target.getPosition().getZ()-getPosition().getZ());
 		getRotation().setY((float)Math.toDegrees(direction));
-		if (!canAttack()) return;
 		// TODO : no default attack ?
-		getAcceleration().addY(.3f);// debug only
+		//getAcceleration().addY(.3f);// TODO : debug only
 		cooldown = 0;
 	}
 	

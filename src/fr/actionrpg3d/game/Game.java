@@ -1,6 +1,8 @@
 package fr.actionrpg3d.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -11,9 +13,9 @@ import fr.actionrpg3d.game.entities.AI;
 import fr.actionrpg3d.game.entities.Controlable;
 import fr.actionrpg3d.game.entities.Entity;
 import fr.actionrpg3d.game.entities.Gravity;
-import fr.actionrpg3d.game.entities.Modelizable;
 import fr.actionrpg3d.game.entities.Moveable;
 import fr.actionrpg3d.game.entities.Player;
+import fr.actionrpg3d.game.entities.Skeleton;
 import fr.actionrpg3d.game.entities.Snowball;
 import fr.actionrpg3d.game.entities.Statue;
 import fr.actionrpg3d.game.entities.Wizard;
@@ -29,6 +31,8 @@ public class Game {
 	private Dungeon dungeon;
 	
 	private List<Entity> entities = new ArrayList<Entity>();
+	private List<Entity> entitiesToAdd = new ArrayList<Entity>();
+	private List<Entity> entitiesToRemove = new ArrayList<Entity>();
 	private List<Entity> currentWave = null;
 	
 	private final Camera camera;
@@ -47,10 +51,11 @@ public class Game {
 		entities.add(player = new Player(this, new Vector3f(startPoint.getX(), 1, startPoint.getY()), new Model("/models/robot.model")));
 		if (camera instanceof FirstPersonCamera) ((FirstPersonCamera)camera).setFollowed(player);
 		if (camera instanceof ThirdPersonCamera) ((ThirdPersonCamera)camera).setFollowed(player);
-		entities.add(new Snowball(this, new Vector3f(0, 5, 0), new Model("/models/cube.model")));
+		//entities.add(new Entity(this, new Vector3f(0, 5, 0), new Model("/models/cube.model")));
 		entities.add(new Wizard(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
 		entities.add(new Statue(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
-		Entity snowball = new Snowball(this, new Vector3f(5, 3, 10), new Model("/models/snowball.model"));
+		entities.add(new Skeleton(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
+		Entity snowball = new Snowball(this, new Vector3f(5, 3, 10));
 		((Moveable)snowball).getAcceleration().set(-1, .5f, 0);
 		entities.add(snowball);
 	}
@@ -75,7 +80,7 @@ public class Game {
 				Room room = dungeon.getRoom(entity.getPosition().getX()/2, entity.getPosition().getZ()/2);
 				if (room != null && !room.isClear() && (currentWave==null || currentWave.size()==0)) { // new wave
 					if (room.getWavesNumber() == 0) {
-						System.out.println("Salle terminée");
+						System.out.println("Salle terminï¿½e");
 						currentWave = null;
 						room.setClear(true);
 					} else {
@@ -85,7 +90,15 @@ public class Game {
 				}
 			}
 		}
-		((Modelizable)entities.get(1)).getRotation().add(new Vector3f(2f,1f,3f)); // TODO : debug only
+		for (Iterator<Entity> it = entitiesToAdd.iterator(); it.hasNext(); it.remove()) {
+			Entity entity = it.next();
+			entities.add(entity);
+		}
+		for (Iterator<Entity> it = entitiesToRemove.iterator(); it.hasNext(); it.remove()) {
+			Entity entity = it.next();
+			entities.remove(entity);
+		}
+		//((Modelizable)entities.get(1)).getRotation().add(new Vector3f(2f,1f,3f)); // TODO : debug only
 	}
 	
 	public Dungeon getDungeon() {
@@ -93,7 +106,15 @@ public class Game {
 	}
 
 	public List<Entity> getEntities() {
-		return entities;
+		return Collections.unmodifiableList(entities);
+	}
+	
+	public void addEntity(Entity entity) {
+		entitiesToAdd.add(entity);
+	}
+	
+	public void removeEntity(Entity entity) {
+		entitiesToRemove.add(entity);
 	}
 
 	public Camera getCamera() {

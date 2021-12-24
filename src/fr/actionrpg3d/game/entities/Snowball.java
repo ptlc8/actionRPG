@@ -11,9 +11,9 @@ public class Snowball extends Entity implements Modelizable, Gravity {
 	Vector3f speed;
 	Vector3f acceleration;
 	
-	public Snowball(Game game, Vector3f position, Model model) {
+	public Snowball(Game game, Vector3f position) {
 		super(game, position);
-		this.model = model;
+		this.model = new Model("/models/snowball.model");
 		rotation = new Vector3f();
 		speed = new Vector3f();
 		acceleration = new Vector3f();

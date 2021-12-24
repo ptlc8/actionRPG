@@ -15,7 +15,7 @@ public class Player extends Creature implements FirstPersonControlable {
 	
 	private static final float speedValue = 0.02f;
 	private static final int health = 100;
-	private static final Prism hitbox = new Prism(new Shape.RegularPolygon(16, .5f, 22.5f), 2); // TODO : à adapter en cylindre
+	private static final Prism hitbox = new Prism(new Shape.RegularPolygon(16, .5f, 22.5f), 2); // TODO : Ã  adapter en cylindre
 	private static final Weapon defaultWeapon = new InfightWeapon(new Model("/models/stick.model"), 2, 10, 60, 0.5f);
 	
 	private Weapon weapon = defaultWeapon; // @NonNullable
