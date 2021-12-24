@@ -21,7 +21,7 @@ import fr.actionrpg3d.math.Vector3f;
 
 public class Main {
 	
-	private static final String VERSION = "0.0.3";
+	private static final String VERSION = "0.1.0";
 	private static final String DATE = "27/05/2020";
 	
 	private static boolean running = true;
