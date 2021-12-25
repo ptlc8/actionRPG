@@ -39,9 +39,9 @@ public class Controls {
 	}
 	
 	public void poll() {
-		MouseDX = Mouse.getDX()/6;
-		MouseDY = Mouse.getDY()/6;
-		MouseDWheel = Mouse.getDWheel()/10;
+		MouseDX = Mouse.getDX()/6f;
+		MouseDY = Mouse.getDY()/6f;
+		MouseDWheel = Mouse.getDWheel()/10f;
 		leftRightAxis = Math.max(rightInput.getValue(),rightInput2.getValue()) - Math.max(leftInput.getValue(),leftInput2.getValue());
 		backwardForwardAxis = Math.max(forwardInput.getValue(),forwardInput2.getValue()) - Math.max(backwardInput.getValue(),backwardInput2.getValue());
 		downUpAxis = Math.max(upInput.getValue(),upInput2.getValue()) - Math.max(downInput.getValue(),downInput2.getValue());
