@@ -6,11 +6,13 @@ import org.lwjgl.LWJGLException;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import org.lwjgl.input.Controllers;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
+import fr.actionrpg3d.game.Controls;
 import fr.actionrpg3d.game.Game;
 import fr.actionrpg3d.render.Camera;
 import fr.actionrpg3d.render.FirstPersonCamera;
@@ -96,9 +98,14 @@ public class Main {
 		Mouse.setGrabbed(true);
 		camera = new FirstPersonCamera(1.6f);
 		//camera = new ThirdPersonCamera(new Vector3f(0, 8, 0));
-		//camera = new FreeCamera(new Vector3f(0, -5, 0));
+		//camera = new FreeCamera(new Vector3f(0, -5, 0), new Controls());
 		camera.setPerspectiveProjection(70f, 0.1f, 100f);
 		game = new Game(camera);
+		try {
+			Controllers.create();
+		} catch (LWJGLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static void render() {
