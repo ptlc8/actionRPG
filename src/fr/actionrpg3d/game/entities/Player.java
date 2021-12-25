@@ -1,8 +1,7 @@
 package fr.actionrpg3d.game.entities;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-
+import fr.actionrpg3d.game.Controls;
 import fr.actionrpg3d.game.Game;
 import fr.actionrpg3d.game.collision.Prism;
 import fr.actionrpg3d.game.collision.Shape;
@@ -18,11 +17,13 @@ public class Player extends Creature implements FirstPersonControlable {
 	private static final Prism hitbox = new Prism(new Shape.RegularPolygon(16, .5f, 22.5f), 2); // TODO : à adapter en cylindre
 	private static final Weapon defaultWeapon = new InfightWeapon(new Model("/models/stick.model"), 2, 10, 60, 0.5f);
 	
+	private Controls controls = null;
 	private Weapon weapon = defaultWeapon; // @NonNullable
 	private int cooldown = 0;
 	
-	public Player(Game game, Vector3f position, Model model) {
+	public Player(Game game, Vector3f position, Model model, Controls controls) {
 		super(game, position, model, hitbox, position, health);
+		this.controls = controls;
 	}
 	
 	private void attack() {
@@ -42,6 +43,11 @@ public class Player extends Creature implements FirstPersonControlable {
 		}
 	}
 	
+	@Override
+	public Controls getControls() {
+		return controls;
+	}
+	
 	public Vector3f getHandPosition() {
 		return new Vector3f(-.8f, .8f, 1).rotate(getRotation().clone().setX(0).setZ(0));
 	}
@@ -49,31 +55,6 @@ public class Player extends Creature implements FirstPersonControlable {
 	@Override
 	public float getSpeedValue() {
 		return speedValue;
-	}
-	
-	@Override
-	public boolean moveForward() {
-		return Keyboard.isKeyDown(Keyboard.KEY_Z);
-	}
-	@Override
-	public boolean moveBackward() {
-		return Keyboard.isKeyDown(Keyboard.KEY_S);
-	}
-	@Override
-	public boolean moveLeft() {
-		return Keyboard.isKeyDown(Keyboard.KEY_Q);
-	}
-	@Override
-	public boolean moveRight() {
-		return Keyboard.isKeyDown(Keyboard.KEY_D);
-	}
-	@Override
-	public boolean moveUp() {
-		return Keyboard.isKeyDown(Keyboard.KEY_SPACE);
-	}
-	@Override
-	public boolean moveDown() {
-		return Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
 	}
 	
 	public Weapon getWeapon() {

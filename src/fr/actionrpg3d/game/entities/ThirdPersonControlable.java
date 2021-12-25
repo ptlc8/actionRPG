@@ -1,24 +1,27 @@
 package fr.actionrpg3d.game.entities;
 
+import fr.actionrpg3d.game.Controls;
 import fr.actionrpg3d.math.Vector3f;
 
 public interface ThirdPersonControlable extends Controlable {
 	
 	default void updateControlable() {
+		Controls controls = getControls();
+		controls.poll();
 		Vector3f move = new Vector3f();
-		if (moveForward()) {
+		if (controls.getForward()>0) {
 			move.subZ(1f);
 		}
-		if (moveBackward()) {
+		if (controls.getBackward()>0) {
 			move.addZ(1f);
 		}
-		if (moveLeft()) {
+		if (controls.getLeft()>0) {
 			move.subX(1f);
 		}
-		if (moveRight()) {
+		if (controls.getRight()>0) {
 			move.addX(1f);
 		}
-		if (moveDown()) {
+		if (controls.getDown()>0) {
 			move.subY(1f);
 		}
 		if (!move.isZero()) move.normalize();
@@ -28,7 +31,7 @@ public interface ThirdPersonControlable extends Controlable {
 		getRotation().setY((float)Math.toDegrees(Math.atan2(move.getX(), move.getZ())));
 		
 		//jump
-		if (moveUp() && getSolidAltitude() <= 0) {
+		if (controls.getUp()>0 && getSolidAltitude() <= 0) {
 			getAcceleration().addY(.3f);
 		}
 	}

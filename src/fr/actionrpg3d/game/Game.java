@@ -16,7 +16,6 @@ import fr.actionrpg3d.game.entities.Gravity;
 import fr.actionrpg3d.game.entities.Moveable;
 import fr.actionrpg3d.game.entities.Player;
 import fr.actionrpg3d.game.entities.Skeleton;
-import fr.actionrpg3d.game.entities.Snowball;
 import fr.actionrpg3d.game.entities.Statue;
 import fr.actionrpg3d.game.entities.Wizard;
 import fr.actionrpg3d.math.Vector2f;
@@ -48,16 +47,13 @@ public class Game {
 		// TODO : rien pour l'instant
 		Player player;
 		Vector2f startPoint = dungeon.getStartPoint().mul(2); //new Vector2f(-2, -4);
-		entities.add(player = new Player(this, new Vector3f(startPoint.getX(), 1, startPoint.getY()), new Model("/models/robot.model")));
+		entities.add(player = new Player(this, new Vector3f(startPoint.getX(), 1, startPoint.getY()), new Model("/models/robot.model"), new Controls()));
 		if (camera instanceof FirstPersonCamera) ((FirstPersonCamera)camera).setFollowed(player);
 		if (camera instanceof ThirdPersonCamera) ((ThirdPersonCamera)camera).setFollowed(player);
 		//entities.add(new Entity(this, new Vector3f(0, 5, 0), new Model("/models/cube.model")));
 		entities.add(new Wizard(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
 		entities.add(new Statue(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
 		entities.add(new Skeleton(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
-		Entity snowball = new Snowball(this, new Vector3f(5, 3, 10));
-		((Moveable)snowball).getAcceleration().set(-1, .5f, 0);
-		entities.add(snowball);
 	}
 	
 	private boolean echaping = false; // tmp ?

@@ -1,14 +1,15 @@
 package fr.actionrpg3d.render;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-
+import fr.actionrpg3d.game.Controls;
 import fr.actionrpg3d.math.Vector3f;
 
 public class FreeCamera extends Camera {
 	
-	public FreeCamera(Vector3f position) {
+	private Controls controls;
+	
+	public FreeCamera(Vector3f position, Controls controls) {
 		super(position);
+		this.controls = controls;
 	}
 	
 	private float speed = .2f;
@@ -17,31 +18,17 @@ public class FreeCamera extends Camera {
 	public void update() {
 		Vector3f position = getPosition();
 		Vector3f rotation = getRotation();
-		if (Mouse.isButtonDown(0)) {
-			rotation.addX(-Mouse.getDY());
-			rotation.addY(Mouse.getDX());
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-			position.addZ((float)(speed*Math.cos(Math.toRadians(rotation.getY()))));
-			position.addX((float)(-speed*Math.sin(Math.toRadians(rotation.getY()))));
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-			position.addZ((float)(-speed*Math.cos(Math.toRadians(rotation.getY()))));
-			position.addX((float)(speed*Math.sin(Math.toRadians(rotation.getY()))));
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
-			position.addX((float)(speed*Math.cos(Math.toRadians(rotation.getY()))));
-			position.addZ((float)(speed*Math.sin(Math.toRadians(rotation.getY()))));
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
-			position.addX((float)(-speed*Math.cos(Math.toRadians(rotation.getY()))));
-			position.addZ((float)(-speed*Math.sin(Math.toRadians(rotation.getY()))));
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-			position.addY(-speed);
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-			position.addY(speed);
-		}
+		controls.poll();
+		// control rotation
+		rotation.addX(-controls.getCameraXAxis()*2);
+		rotation.addY(controls.getCameraYAxis()*3);
+		// move forward and backward
+		position.addZ(controls.getBackwardForwardAxis()*speed*(float)(Math.cos(Math.toRadians(rotation.getY()))));
+		position.addX(-controls.getBackwardForwardAxis()*speed*(float)(Math.sin(Math.toRadians(rotation.getY()))));
+		// move right and left
+		position.addX(-speed*controls.getLeftRightAxis()*(float)(Math.cos(Math.toRadians(rotation.getY()))));
+		position.addZ(-speed*controls.getLeftRightAxis()*(float)(Math.sin(Math.toRadians(rotation.getY()))));
+		// move up and down
+		position.addY(-speed*controls.getDownUpAxis());
 	}
 }

@@ -1,42 +1,43 @@
 package fr.actionrpg3d.game.entities;
 
-import org.lwjgl.input.Mouse;
-
+import fr.actionrpg3d.game.Controls;
 import fr.actionrpg3d.math.Vector3f;
 
 public interface FirstPersonControlable extends Controlable {
 	
 	default void updateControlable() {
+		Controls controls = getControls();
+		controls.poll();
 		Vector3f move = new Vector3f();
 		Vector3f rot = getRotation();
 		//if (Mouse.isButtonDown(0)) {
-			rot.addX(-Mouse.getDY()/2);
-			rot.addY(-Mouse.getDX()/2);
+			rot.addX(-controls.getCameraXAxis()*2);
+			rot.addY(-controls.getCameraYAxis()*3);
 		//}
-		if (moveForward()) {
+		if (controls.getForward()>0) {
 			move.addZ((float)(Math.cos(Math.toRadians(rot.getY()))));
 			move.addX((float)(Math.sin(Math.toRadians(rot.getY()))));
 		}
-		if (moveBackward()) {
+		if (controls.getBackward()>0) {
 			move.addZ((float)(-Math.cos(Math.toRadians(rot.getY()))));
 			move.addX((float)(-Math.sin(Math.toRadians(rot.getY()))));
 		}
-		if (moveLeft()) {
+		if (controls.getLeft()>0) {
 			move.addX((float)(Math.cos(Math.toRadians(rot.getY()))));
 			move.addZ((float)(-Math.sin(Math.toRadians(rot.getY()))));
 		}
-		if (moveRight()) {
+		if (controls.getRight()>0) {
 			move.addX((float)(-Math.cos(Math.toRadians(rot.getY()))));
 			move.addZ((float)(Math.sin(Math.toRadians(rot.getY()))));
 		}
-		if (moveDown()) {
+		if (controls.getDown()>0) {
 			move.addY(-1);
 		}
 		if (!move.isZero()) move.normalize();
 		move.mul(getSpeedValue());
 		getAcceleration().add(move);
 		//jump
-		if (moveUp() && getSolidAltitude() <= 0.01f) {
+		if (controls.getUp()>0 && getSolidAltitude() <= 0.01f) {
 			getAcceleration().addY(.3f);
 		}
 	}
