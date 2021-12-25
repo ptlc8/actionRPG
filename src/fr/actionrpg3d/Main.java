@@ -34,6 +34,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		System.setProperty("org.lwjgl.librarypath", new File("native/"+getOS()).getAbsolutePath());
+		System.setProperty("net.java.games.input.librarypath", new File("native/"+getOS()).getAbsolutePath());
 		System.out.println("\"actionrpg3d\" " + VERSION + ", par PTLC_, le " + DATE + ", pour tous, vive l'Amour !");
 		
 		try {
