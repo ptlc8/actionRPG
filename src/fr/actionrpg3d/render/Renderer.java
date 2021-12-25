@@ -9,6 +9,7 @@ import fr.actionrpg3d.game.Game;
 import fr.actionrpg3d.game.entities.Creature;
 import fr.actionrpg3d.game.entities.Entity;
 import fr.actionrpg3d.game.entities.Modelizable;
+import fr.actionrpg3d.game.entities.Player;
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Model.Shape;
 
@@ -24,7 +25,7 @@ public class Renderer {
 				float cooldown = (float) ((Player)creature).getCooldown() / ((Player)creature).getWeapon().getCooldown();
 				renderPlayerCooldown(cooldown, aspect);
 			}*/
-			glColor3f(.7f, .7f, .7f); // blanc cassé
+			glColor3f(.7f, .7f, .7f); // blanc cassï¿½
 			glBegin(GL_LINES);
 			glVertex2f(-.02f, 0);
 			glVertex2f(.02f, 0);
@@ -44,7 +45,7 @@ public class Renderer {
 		glVertex2f(-.95f+.675f*health, -.95f);
 		glVertex2f(-.95f+.625f*health, -.85f);
 		glEnd();
-		glColor3f(.7f, .7f, .7f); // blanc cassé
+		glColor3f(.7f, .7f, .7f); // blanc cassï¿½
 		glBegin(GL_QUADS);
 		glVertex2f(-1, -.8f);
 		glVertex2f(-1, -1);
@@ -61,7 +62,7 @@ public class Renderer {
 		glVertex2f(.95f-.625f*cooldown, -.875f);
 		glVertex2f(.95f-.675f*cooldown, -.975f);
 		glEnd();
-		glColor3f(.7f, .7f, .7f); // blanc cassé
+		glColor3f(.7f, .7f, .7f); // blanc cassï¿½
 		glBegin(GL_QUADS);
 		glVertex2f(1, -1);
 		glVertex2f(1, -.85f);
@@ -76,10 +77,10 @@ public class Renderer {
 			if (entity instanceof Modelizable) {
 				if (!(game.getCamera() instanceof FirstPersonCamera && ((FirstPersonCamera)game.getCamera()).getFollowed()==entity))
 					render(((Modelizable)entity).getModel(), entity.getPosition(), ((Modelizable)entity).getRotation());
-				/*if (entity instanceof Player && ((Player)entity).getWeapon()!=null) {
+				if (entity instanceof Player && ((Player)entity).getWeapon()!=null) {
 					Player player = (Player)entity;
-					render(player.getWeapon().getModel(), player.getPosition().clone().add(player.getHandPosition()), player.getRotation().clone().setX(0).setZ(0));
-				}*/
+					render(player.getWeapon().getModel(), player.getHandPosition().add(player.getPosition()), player.getRotation().clone().setX(0).setZ(0));
+				}
 			}
 		}		
 		
