@@ -1,6 +1,6 @@
 package fr.actionrpg3d.math;
 
-public class Vector3f {
+public class Vector3f implements Cloneable {
 	
 	private float x, y, z;
 	
