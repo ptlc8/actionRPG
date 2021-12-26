@@ -20,14 +20,12 @@ public class Wizard extends Enemy {
 	@Override
 	public void attack(Creature target) {
 		super.attack(target);
-		Snowball sb = new Snowball(getGame(), new Vector3f(getPosition()).addY(1));
 		Vector3f direction = new Vector3f(target.getPosition());
 		direction.sub(getPosition());
 		direction.normalize();
 		direction.mul(2);
 		direction.addY(0.1f);
-		sb.getAcceleration().set(direction);
-		getGame().addEntity(sb);
+		getGame().addEntity(new Snowball(getGame(), new Vector3f(getPosition()).addY(1), direction));
 
 	}
 
