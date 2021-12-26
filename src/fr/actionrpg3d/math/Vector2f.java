@@ -92,8 +92,8 @@ public class Vector2f {
 	
 	public Vector2f rotate(float rot) {
 		Vector2f v = new Vector2f(this);
-		float cosR = (float) Math.cos(Math.toDegrees(rot));
-		float sinR = (float) Math.sin(Math.toDegrees(rot));
+		float cosR = (float) Math.cos(Math.toRadians(rot));
+		float sinR = (float) Math.sin(Math.toRadians(rot));
 		v.setX(x*cosR - y*sinR);
 		v.setY(x*sinR + y*cosR);
 		set(v.x, v.y);
@@ -102,8 +102,8 @@ public class Vector2f {
 	
 	public Vector2f rotate(float rot, Vector2f center) {
 		Vector2f v = new Vector2f(this);
-		float cosR = (float) Math.cos(Math.toDegrees(rot));
-		float sinR = (float) Math.sin(Math.toDegrees(rot));
+		float cosR = (float) Math.cos(Math.toRadians(rot));
+		float sinR = (float) Math.sin(Math.toRadians(rot));
 		sub(center);
 		v.setX(x*cosR - y*sinR);
 		v.setY(x*sinR + y*cosR);
@@ -165,6 +165,11 @@ public class Vector2f {
 	public Vector2f mulY(float y) {
 		this.y *= y;
 		return this;
+	}
+	
+	@Override
+	public String toString() {
+		return "("+x+","+y+")";
 	}
 	
 }

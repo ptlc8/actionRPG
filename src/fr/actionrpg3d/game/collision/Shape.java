@@ -44,6 +44,9 @@ public class Shape extends ArrayList<Vector2f> {
 				add(new Vector2f((float)Math.cos(2*Math.PI/n*i+startAngle)*r, (float)Math.sin(2*Math.PI/n*i+startAngle)*r));
 			}
 		}
+		public RegularPolygon(int n, float r) {
+			this(n, r, 180f/n);
+		}
 	}
 	
 	public static class Circle extends Shape {
@@ -55,6 +58,9 @@ public class Shape extends ArrayList<Vector2f> {
 		}
 		public float getRadius() {
 			return r;
+		}
+		public Vector2f getCenter() {
+			return get(0);
 		}
 	}
 	

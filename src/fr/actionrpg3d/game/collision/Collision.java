@@ -1,5 +1,6 @@
 package fr.actionrpg3d.game.collision;
 
+import fr.actionrpg3d.game.collision.Shape.Circle;
 import fr.actionrpg3d.math.Vector2f;
 import fr.actionrpg3d.math.Vector3f;
 
@@ -18,7 +19,7 @@ public class Collision {
 		
 		if (Math.abs(pos1.length()-pos2.length()) > shape1.getMaxRadius()+shape2.getMaxRadius()) return false;
 		
-		for (int i = 0; i < shape1.size(); i++) { // pour toutes les faces de vertex1
+		if (shape1.size()>1) for (int i = 0; i < shape1.size(); i++) { // pour toutes les faces de shape1
 			final Vector2f v1 = shape1.get(i), v2 = shape1.get(i == 0 ? shape1.size()-1 : i-1);
 			
 			float normalAngle = (float) Math.toDegrees(Math.atan2(v1.getY()-v2.getY(), v1.getX()-v2.getX())) + rot1;
@@ -33,23 +34,31 @@ public class Collision {
 			
 			float min2 = Float.MAX_VALUE;
 			float max2 = -Float.MAX_VALUE;
-			for (Vector2f vertex : shape2) {
+			if (shape2 instanceof Circle) {
+				min2 = ((Circle)shape2).getCenter().clone().rotate(rot2).add(pos2).rotate(normalAngle).getX() - ((Circle)shape2).getRadius();
+				max2 = ((Circle)shape2).getCenter().clone().rotate(rot2).add(pos2).rotate(normalAngle).getX() + ((Circle)shape2).getRadius();
+			} else for (Vector2f vertex : shape2) {
 				Vector2f v = vertex.clone().rotate(rot2).add(pos2).rotate(normalAngle);
 				if (v.getX() < min2) min2 = v.getX();
 				if (v.getX() > max2) max2 = v.getX();
 			}
-			if (max1 < min2 || max2 < min1) return false;
+			
+			if (max1 < min2 || max2 < min1)
+				return false;
 			
 		}
 		
-		for (int i = 0; i < shape2.size(); i++) { // pour toutes les faces de vertex2
+		if (shape2.size()>1) for (int i = 0; i < shape2.size(); i++) { // pour toutes les faces de shape2
 			final Vector2f v1 = shape2.get(i), v2 = shape2.get(i == 0 ? shape2.size()-1 : i-1);
 			
 			float normalAngle = (float) Math.toDegrees(Math.atan2(v1.getY()-v2.getY(), v1.getX()-v2.getX())) + rot2;
 			
 			float min1 = Float.MAX_VALUE;
 			float max1 = -Float.MAX_VALUE;
-			for (Vector2f vertex : shape1) {
+			if (shape1 instanceof Circle) {
+				min1 = ((Circle)shape1).getCenter().clone().rotate(rot1).add(pos1).rotate(normalAngle).getX() - ((Circle)shape1).getRadius();
+				max1 = ((Circle)shape1).getCenter().clone().rotate(rot1).add(pos1).rotate(normalAngle).getX() + ((Circle)shape1).getRadius();
+			} else for (Vector2f vertex : shape1) {
 				Vector2f v = vertex.clone().rotate(rot1).add(pos1).rotate(normalAngle);
 				if (v.getX() < min1) min1 = v.getX();
 				if (v.getX() > max1) max1 = v.getX();
@@ -62,8 +71,9 @@ public class Collision {
 				if (v.getX() < min2) min2 = v.getX();
 				if (v.getX() > max2) max2 = v.getX();
 			}
-
-			if (max1 < min2 || max2 < min1) return false;
+			
+			if (max1 < min2 || max2 < min1)
+				return false;
 			
 		}
 		
