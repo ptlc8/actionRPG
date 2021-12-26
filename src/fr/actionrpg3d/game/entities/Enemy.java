@@ -18,8 +18,8 @@ public abstract class Enemy extends Creature implements AI {
 	
 	private float direction = 0;
 	
-	public Enemy(Game game, Vector3f position, Model model, Prism hitbox, Vector3f hitboxCenter, int health, float speed, int sight, int reach, int maxReach, int cooldown) {
-		super(game, position, model, hitbox, hitboxCenter, health);
+	public Enemy(Game game, Vector3f position, Model model, Prism hitbox, int health, float speed, int sight, int reach, int maxReach, int cooldown) {
+		super(game, position, model, hitbox, health);
 		this.speedValue = speed;
 		this.sight = sight;
 		this.reach = reach;

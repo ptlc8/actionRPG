@@ -13,7 +13,7 @@ public class Statue extends Enemy {
 	private static final Prism hitbox = new Prism(new Shape.RegularPolygon(8, .5f), 1.9f); // TODO
 	
 	public Statue(Game game, Vector3f position) {
-		super(game, position, new Model("/models/statue.model"), hitbox, new Vector3f(0, -.95f, 0), health, speed, sight, reach, maxReach, cooldown);
+		super(game, position, new Model("/models/statue.model"), hitbox,  health, speed, sight, reach, maxReach, cooldown);
 		
 	}
 	

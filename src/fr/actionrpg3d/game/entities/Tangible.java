@@ -5,8 +5,6 @@ import fr.actionrpg3d.math.Vector3f;
 
 public interface Tangible {
 	
-	Vector3f getHitboxCenter();
-	
 	Prism getHitbox();
 	
 	Vector3f getRotation();

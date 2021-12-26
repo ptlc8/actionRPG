@@ -23,10 +23,10 @@ public interface Moveable {
 			for (int i = Math.min(dungeon.getHeight(),Math.max(0,(int)(getPosition().getZ()/2)-1)); i < Math.min(dungeon.getHeight(), Math.max(0, (int)(getPosition().getZ()/2)+3)); i++) {
 				for (int j = Math.min(dungeon.getWidth(),Math.max(0,(int)(getPosition().getX()/2)-1)); j < Math.min(dungeon.getWidth(),Math.max(0,(int)(getPosition().getX()/2)+3)); j++) {
 					if (dungeon.isWall(j, i)) {
-						if (Collision.has(getPosition().clone().addZ(getSpeed().getZ())/*.add(((Tangible)this).getHitboxCenter())*/.getVector2fFromXZ(), ((Tangible)this).getHitbox().getShape(), 0, new Vector2f(j*2, i*2), new Shape.Rectangle(2, 2), 0)) {
+						if (Collision.has(getPosition().clone().addZ(getSpeed().getZ()).getVector2fFromXZ(), ((Tangible)this).getHitbox().getShape(), 0, new Vector2f(j*2, i*2), new Shape.Rectangle(2, 2), 0)) {
 							getSpeed().setZ(0);
 						}
-						if (Collision.has(getPosition().clone().addX(getSpeed().getX())/*.add(((Tangible)this).getHitboxCenter())*/.getVector2fFromXZ(), ((Tangible)this).getHitbox().getShape(), 0, new Vector2f(j*2, i*2), new Shape.Rectangle(2, 2), 0)) {
+						if (Collision.has(getPosition().clone().addX(getSpeed().getX()).getVector2fFromXZ(), ((Tangible)this).getHitbox().getShape(), 0, new Vector2f(j*2, i*2), new Shape.Rectangle(2, 2), 0)) {
 							getSpeed().setX(0);
 						}
 					}

@@ -55,13 +55,6 @@ public class Projectile extends Entity implements Modelizable, Gravity, Tangible
 		return getPosition().getY();
 	}
 
-
-	@Override
-	public Vector3f getHitboxCenter() {
-		return new Vector3f();
-	}
-
-
 	@Override
 	public Prism getHitbox() {
 		return hitbox;

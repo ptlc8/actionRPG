@@ -12,17 +12,15 @@ public abstract class Creature extends Entity implements Moveable, Modelizable, 
 	private Vector3f speed;
 	private Vector3f acceleration;
 	private Prism hitbox;
-	private Vector3f hitboxCenter;
 	private static final Vector3f friction = new Vector3f(1.2f, 1.05f, 1.2f);
 	
 	private final int maxHealth;
 	private int health;
 	
-	public Creature(Game game, Vector3f position, Model model, Prism hitbox, Vector3f hitboxCenter, int health) {
+	public Creature(Game game, Vector3f position, Model model, Prism hitbox, int health) {
 		super(game, position);
 		this.model = model;
 		this.hitbox = hitbox;
-		this.hitboxCenter = hitboxCenter;
 		rotation = new Vector3f();
 		speed = new Vector3f();
 		acceleration = new Vector3f();
@@ -58,11 +56,6 @@ public abstract class Creature extends Entity implements Moveable, Modelizable, 
 	@Override
 	public float getSolidAltitude() {
 		return getPosition().getY();
-	}
-	
-	@Override
-	public Vector3f getHitboxCenter() {
-		return hitboxCenter;
 	}
 
 	@Override

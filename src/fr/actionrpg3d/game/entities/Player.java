@@ -21,7 +21,7 @@ public class Player extends Creature implements FirstPersonControlable {
 	private int cooldown = 0;
 	
 	public Player(Game game, Vector3f position, Model model, Controls controls) {
-		super(game, position, model, hitbox, position, health);
+		super(game, position, model, hitbox, health);
 		this.controls = controls;
 	}
 	

@@ -11,9 +11,10 @@ public class Diablotin extends Enemy {
 	private static final float speed = .025f;
 	private static final int health = 12, sight = 22, reach = 2, maxReach = 1, cooldown = 60;
 	private static final Prism hitbox = new Prism(new Shape.RegularPolygon(8, .5f), 1.9f); // TODO
+	private static final Model model = new Model("/models/robot.model");
 	
 	public Diablotin(Game game, Vector3f position) {
-		super(game, position, new Model("/models/robot.model"), hitbox, new Vector3f(0, -.95f, 0), health, speed, sight, reach, maxReach, cooldown);
+		super(game, position, model, hitbox, health, speed, sight, reach, maxReach, cooldown);
 		
 	}
 
