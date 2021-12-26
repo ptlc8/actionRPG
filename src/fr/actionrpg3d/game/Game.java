@@ -37,6 +37,7 @@ public class Game {
 	private final Camera camera;
 	
 	private boolean paused = false;
+	private boolean debug = false;
 	
 	public Game(Camera camera) {
 		this.camera = camera;
@@ -130,6 +131,14 @@ public class Game {
 		paused = false;
 		Mouse.setCursorPosition(Display.getWidth()/2, Display.getHeight()/2);
 		Mouse.setGrabbed(true);
+	}
+	
+	public boolean isDebug() {
+		return debug;
+	}
+	
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 	
 }

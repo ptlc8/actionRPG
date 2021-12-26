@@ -6,10 +6,13 @@ import org.lwjgl.opengl.Display;
 
 import fr.actionrpg3d.game.Dungeon;
 import fr.actionrpg3d.game.Game;
+import fr.actionrpg3d.game.collision.Prism;
 import fr.actionrpg3d.game.entities.Creature;
 import fr.actionrpg3d.game.entities.Entity;
 import fr.actionrpg3d.game.entities.Modelizable;
 import fr.actionrpg3d.game.entities.Player;
+import fr.actionrpg3d.game.entities.Tangible;
+import fr.actionrpg3d.math.Vector2f;
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Model.Shape;
 
@@ -77,6 +80,8 @@ public class Renderer {
 			if (entity instanceof Modelizable) {
 				if (!(game.getCamera() instanceof FirstPersonCamera && ((FirstPersonCamera)game.getCamera()).getFollowed()==entity))
 					render(((Modelizable)entity).getModel(), entity.getPosition(), ((Modelizable)entity).getRotation());
+				if (game.isDebug() && entity instanceof Tangible)
+					render(((Tangible)entity).getHitbox(), entity.getPosition());
 				if (entity instanceof Player && ((Player)entity).getWeapon()!=null) {
 					Player player = (Player)entity;
 					render(player.getWeapon().getModel(), player.getHandPosition().add(player.getPosition()), player.getRotation().clone().setX(0).setZ(0));
@@ -99,6 +104,23 @@ public class Renderer {
 			for (Vector3f vertex : shape.getVectors()) {
 				Vector3f v = new Vector3f(vertex).rotate(rot);
 				glVertex3f(pos.getX()+v.getX(), pos.getY()+v.getY(), pos.getZ()+v.getZ());
+			}
+			glEnd();
+		}
+	}
+	
+	private static void render(Prism hitbox, Vector3f pos) {
+		glColor3f(1, 1, 1);
+		for (Vector2f vertex : hitbox.getShape()) {
+			glBegin(GL_LINES);
+			glVertex3f(pos.getX()+vertex.getX(), pos.getY(), pos.getZ()+vertex.getY());
+			glVertex3f(pos.getX()+vertex.getX(), pos.getY()+hitbox.getHeight(), pos.getZ()+vertex.getY());
+			glEnd();
+		}
+		for (int i = 0; i < 2; i++) {
+			glBegin(GL_LINES);
+			for (Vector2f vertex : hitbox.getShape()) {
+				glVertex3f(pos.getX()+vertex.getX(), pos.getY()+(i==0?0:hitbox.getHeight()), pos.getZ()+vertex.getY());
 			}
 			glEnd();
 		}
