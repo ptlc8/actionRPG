@@ -104,6 +104,7 @@ public class Main {
 		game = new Game(camera);
 		try {
 			Controllers.create();
+			Controls.refreshControllerIndex();
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}

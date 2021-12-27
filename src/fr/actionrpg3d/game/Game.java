@@ -1,5 +1,6 @@
 package fr.actionrpg3d.game;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -48,7 +49,7 @@ public class Game {
 		// TODO : rien pour l'instant
 		Player player;
 		Vector2f startPoint = dungeon.getStartPoint().mul(2); //new Vector2f(-2, -4);
-		entities.add(player = new Player(this, new Vector3f(startPoint.getX(), 1, startPoint.getY()), new Model("/models/robot.model"), new Controls()));
+		entities.add(player = new Player(this, new Vector3f(startPoint.getX(), 1, startPoint.getY()), new Model("/models/robot.model"), new Controls(new File("controls"))));
 		if (camera instanceof FirstPersonCamera) ((FirstPersonCamera)camera).setFollowed(player);
 		if (camera instanceof ThirdPersonCamera) ((ThirdPersonCamera)camera).setFollowed(player);
 		//entities.add(new Entity(this, new Vector3f(0, 5, 0), new Model("/models/cube.model")));

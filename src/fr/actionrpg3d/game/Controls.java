@@ -1,53 +1,170 @@
 package fr.actionrpg3d.game;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.lwjgl.input.Controllers;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 public class Controls {
 	
-	public Input leftInput = new KeyBoardInput(Keyboard.KEY_Q);
-	public Input rightInput = new KeyBoardInput(Keyboard.KEY_D);
-	public Input leftInput2 = new ControllerAxisInput(0, false);
-	public Input rightInput2 = new ControllerAxisInput(0, true);
-	public Input forwardInput = new KeyBoardInput(Keyboard.KEY_Z);
-	public Input backwardInput = new KeyBoardInput(Keyboard.KEY_S);
-	public Input forwardInput2 = new ControllerAxisInput(1, false);
-	public Input backwardInput2 = new ControllerAxisInput(1, true);
-	public Input upInput = new KeyBoardInput(Keyboard.KEY_SPACE);
-	public Input downInput = new KeyBoardInput(Keyboard.KEY_LSHIFT);
-	public Input upInput2 = new ControllerButtonInput(8);
-	public Input downInput2 = new ControllerButtonInput(6);
-	public Input actionInput = new MouseInput(0);
-	public Input actionInput2 = new ControllerButtonInput(9);
-	public Input cameraXnegInput = new MouseAxis(1, false);
-	public Input cameraXposInput = new MouseAxis(1, true);
-	public Input cameraXnegInput2 = new ControllerAxisInput(3, true);
-	public Input cameraXposInput2 = new ControllerAxisInput(3, false);
-	public Input cameraYnegInput = new MouseAxis(0, false);
-	public Input cameraYposInput = new MouseAxis(0, true);
-	public Input cameraYnegInput2 = new ControllerAxisInput(2, false);
-	public Input cameraYposInput2 = new ControllerAxisInput(2, true);
+	private static int controllerIndex = 0;
+	
+	public static void refreshControllerIndex() {
+		Controllers.poll();
+		for (int i = 0; i < Controllers.getControllerCount(); i++) {
+			if (Controllers.getController(i).getAxisCount()>=4)
+				controllerIndex = i;
+		}
+	}
+	
+	public static Input getLastInput() {
+		Input input = null;
+		long inputTime = 0;
+		// Keyboard events
+		int key = -1;
+		long keyT = 0;
+		while (Keyboard.next()) {
+			key = Keyboard.getEventKey();
+			keyT = Keyboard.getEventNanoseconds();
+		}
+		if (key != -1) {
+			input = new KeyBoardInput(key);
+			inputTime = keyT;
+		}
+		// Mouse events
+		int mouseButton = -1;
+		byte mouseAxis = -1;
+		boolean mouseAxisPositive = true;
+		long mouseT = 0;
+		while (Mouse.next()) {
+			mouseButton = Mouse.getEventButton();
+			mouseAxis = (byte)(Mouse.getEventDX()!=0 ? 0 : Mouse.getEventDY()!=0 ? 1 : Mouse.getEventDWheel()!=0 ? 2 : -1);
+			mouseAxisPositive = Mouse.getEventDX()!=0 ? Mouse.getEventDX()>0 : Mouse.getEventDY()!=0 ? Mouse.getEventDY()>0 : Mouse.getEventDWheel()!=0 ? Mouse.getEventDWheel()>0 : mouseAxisPositive;
+			mouseT = Mouse.getEventNanoseconds();
+		}
+		if (mouseButton!=-1 && mouseT>inputTime) {
+			input = new MouseButtonInput(mouseButton);
+			inputTime = mouseT;
+		}
+		if (mouseAxis!=-1 && mouseT>inputTime) {
+			input = new MouseAxisInput(mouseAxis, mouseAxisPositive);
+			inputTime = mouseT;
+		}
+		// Controller events
+		int controllerComponent = -1;
+		boolean isControllerAxis = false;
+		long controllerT = 0;
+		while(Controllers.next()) {
+			controllerComponent = Controllers.getEventControlIndex();
+			isControllerAxis = Controllers.isEventAxis();
+			controllerT = Controllers.getEventNanoseconds();
+		}
+		if (controllerComponent!=-1 && controllerT>inputTime) {
+			if (isControllerAxis)
+				input = new ControllerAxisInput(controllerComponent, Controllers.getController(controllerIndex).getAxisValue(controllerComponent)>0);
+			else
+				input = new ControllerButtonInput(controllerComponent);
+			inputTime = controllerT;
+		}
+		if (input!=null)
+			System.out.println(input.getName());
+		return input;
+	}
+	
+	public Map<String, List<Input>> inputs;
 	
 	private float leftRightAxis=0, backwardForwardAxis=0, downUpAxis=0, cameraXAxis=0, cameraYAxis=0;
 	private boolean action=false;
 	
-	private float MouseDX=0, MouseDY=0, MouseDWheel=0;
+	private static float MouseDX=0, MouseDY=0, MouseDWheel=0;
 	
 	public Controls() {
+		inputs = new HashMap<>();
+		inputs.put("left", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_Q), new ControllerAxisInput(0, false))));
+		inputs.put("right", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_D), new ControllerAxisInput(0, true))));
+		inputs.put("forward", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_Z), new ControllerAxisInput(1, false))));
+		inputs.put("backward", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_S), new ControllerAxisInput(1, true))));
+		inputs.put("up", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_SPACE), new ControllerButtonInput(8))));
+		inputs.put("down", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_LSHIFT), new ControllerButtonInput(6))));
+		inputs.put("action", new ArrayList<>(Arrays.asList(new MouseButtonInput(0), new ControllerButtonInput(9))));
+		inputs.put("cameraXneg", new ArrayList<>(Arrays.asList(new MouseAxisInput(1, false), new ControllerAxisInput(3, true))));
+		inputs.put("cameraXpos", new ArrayList<>(Arrays.asList(new MouseAxisInput(1, true), new ControllerAxisInput(3, false))));
+		inputs.put("cameraYneg", new ArrayList<>(Arrays.asList(new MouseAxisInput(0, false), new ControllerAxisInput(2, false))));
+		inputs.put("cameraYpos", new ArrayList<>(Arrays.asList(new MouseAxisInput(0, true), new ControllerAxisInput(2, true))));
 		poll();
+	}
+	
+	public Controls(File file) {
+		this();
+		if (!file.exists())
+			return;
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String line;
+			String inputName = null;
+			while ((line = reader.readLine()) != null) {
+				if (line.endsWith("=")) {
+					inputName = line.substring(0, line.length()-1);
+					if (inputs.get(inputName)==null)
+						inputs.put(inputName, new ArrayList<>());
+					inputs.get(inputName).clear();
+				} else {
+					inputs.get(inputName).add(Input.unserialize(line));
+				}
+			}
+			reader.close();
+			save(new File("controls"));
+		} catch (IOException e) {
+			// do nothing more
+		}
 	}
 	
 	public void poll() {
 		MouseDX = Mouse.getDX()/6f;
 		MouseDY = Mouse.getDY()/6f;
 		MouseDWheel = Mouse.getDWheel()/10f;
-		leftRightAxis = Math.max(rightInput.getValue(),rightInput2.getValue()) - Math.max(leftInput.getValue(),leftInput2.getValue());
-		backwardForwardAxis = Math.max(forwardInput.getValue(),forwardInput2.getValue()) - Math.max(backwardInput.getValue(),backwardInput2.getValue());
-		downUpAxis = Math.max(upInput.getValue(),upInput2.getValue()) - Math.max(downInput.getValue(),downInput2.getValue());
-		cameraXAxis = Math.max(cameraXposInput.getValue(),cameraXposInput2.getValue()) - Math.max(cameraXnegInput.getValue(),cameraXnegInput2.getValue());
-		cameraYAxis = Math.max(cameraYposInput.getValue(),cameraYposInput2.getValue()) - Math.max(cameraYnegInput.getValue(),cameraYnegInput2.getValue());
-		action = actionInput.getValue()>0 || actionInput2.getValue()>0;
+		leftRightAxis = getInputValue("right") - getInputValue("left");
+		backwardForwardAxis = getInputValue("forward") - getInputValue("backward");
+		downUpAxis = getInputValue("up") - getInputValue("down");
+		cameraXAxis = getInputValue("cameraXpos") - getInputValue("cameraXneg");
+		cameraYAxis = getInputValue("cameraYpos") - getInputValue("cameraYneg");
+		action = getInputValue("action")>0;
+	}
+	
+	private float getInputValue(String name) {
+		List<Input> inputs = this.inputs.get(name);
+		float value = 0f;
+		for (Input input : inputs)
+			if (input.getValue() > value)
+				value = input.getValue();
+		return value;
+	}
+	
+	public void save(File file) {
+		try {
+			if (!file.exists())
+			file.createNewFile();
+			PrintWriter writer = new PrintWriter(file);
+			for (Entry<String, List<Input>> e : inputs.entrySet()) {
+				writer.append(e.getKey()+"=\n");
+				for (Input i : e.getValue())
+					writer.append(i.serialize()+"\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public float getLeftRightAxis() {
@@ -93,12 +210,32 @@ public class Controls {
 	}
 	
 	
-	private interface Input {
-		float getValue();
-		String getName();
+	private static abstract class Input {
+		abstract float getValue();
+		abstract String getName();
+		abstract String serialize();
+		static Input unserialize(String str) {
+			String prefix = str.substring(0,2);
+			boolean positive = str.endsWith("+");
+			int value = Integer.parseInt(str.substring(2,str.length()-(str.endsWith("+")||str.endsWith("-")?1:0)));
+			switch (prefix) {
+			case "kb":
+				return new KeyBoardInput(value);
+			case "mb":
+				return new MouseButtonInput(value);
+			case "ma":
+				return new MouseAxisInput(value, positive);
+			case "ca":
+				return new ControllerAxisInput(value, positive);
+			case "cb":
+				return new ControllerButtonInput(value);
+			default:
+				return null;
+			}
+		}
 	}
 	
-	private class KeyBoardInput implements Input {
+	static class KeyBoardInput extends Input {
 		private int key;
 		public KeyBoardInput(int key) {
 			this.key = key;
@@ -111,11 +248,15 @@ public class Controls {
 		public String getName() {
 			return Keyboard.getKeyName(key);
 		}
+		@Override
+		public String serialize() {
+			return "kb"+key;
+		}
 	}
 	
-	private class MouseInput implements Input {
+	static class MouseButtonInput extends Input {
 		private int button;
-		public MouseInput(int button) {
+		public MouseButtonInput(int button) {
 			this.button = button;
 		}
 		@Override
@@ -126,12 +267,16 @@ public class Controls {
 		public String getName() {
 			return Mouse.getButtonName(button);
 		}
+		@Override
+		public String serialize() {
+			return "mb"+button;
+		}
 	}
 	
-	private class MouseAxis implements Input {
+	static class MouseAxisInput extends Input {
 		private int axis;
 		private boolean positive;
-		public MouseAxis(int axis, boolean positive) {
+		public MouseAxisInput(int axis, boolean positive) {
 			this.axis = axis;
 			this.positive = positive;
 		}
@@ -142,11 +287,15 @@ public class Controls {
 		}
 		@Override
 		public String getName() {
-			return axis==2 ? "MouseWheel" : ("MouseMoveAxis"+axis);
+			return (axis==2 ? "Mouse wheel" : axis==0 ? "Mouse X" : axis==1 ? "Mouse Y" : ("Mouse axis"+axis))+(positive?"+":"-");
+		}
+		@Override
+		public String serialize() {
+			return "ma"+axis+(positive?"+":"-");
 		}
 	}
 	
-	private class ControllerAxisInput implements Input {
+	static class ControllerAxisInput extends Input {
 		private int index;
 		private boolean positive;
 		public ControllerAxisInput(int index, boolean positive) {
@@ -155,30 +304,38 @@ public class Controls {
 		}
 		@Override
 		public float getValue() {
-			if (Controllers.getControllerCount()==0 || Controllers.getController(0).getAxisCount()<=index)
+			if (Controllers.getControllerCount()<=controllerIndex || Controllers.getController(controllerIndex).getAxisCount()<=index)
 				return 0;
-			return positive ? Math.max(0, Controllers.getController(0).getAxisValue(index)) : Math.max(0, -Controllers.getController(0).getAxisValue(index));
+			return positive ? Math.max(0, Controllers.getController(controllerIndex).getAxisValue(index)) : Math.max(0, -Controllers.getController(controllerIndex).getAxisValue(index));
 		}
 		@Override
 		public String getName() {
-			return Controllers.getControllerCount()>0 ? Controllers.getController(0).getAxisName(index) : "GamepadAxis "+index;
+			return (Controllers.getControllerCount()>controllerIndex ? Controllers.getController(controllerIndex).getAxisName(index) : "Gamepad axis "+index)+(positive?"+":"-");
+		}
+		@Override
+		public String serialize() {
+			return "ca"+index+(positive?"+":"-");
 		}
 	}
 	
-	private class ControllerButtonInput implements Input {
+	static class ControllerButtonInput extends Input {
 		private int index;
 		public ControllerButtonInput(int index) {
 			this.index = index;
 		}
 		@Override
 		public float getValue() {
-			if (Controllers.getControllerCount()==0 || Controllers.getController(0).getButtonCount()<=index)
+			if (Controllers.getControllerCount()<=controllerIndex || Controllers.getController(controllerIndex).getButtonCount()<=index)
 				return 0;
-			return Controllers.getController(0).isButtonPressed(index) ? 1 : 0;
+			return Controllers.getController(controllerIndex).isButtonPressed(index) ? 1 : 0;
 		}
 		@Override
 		public String getName() {
-			return Controllers.getControllerCount()>0 ? Controllers.getController(0).getButtonName(index) : "GamepadButton "+index;
+			return Controllers.getControllerCount()>controllerIndex ? Controllers.getController(controllerIndex).getButtonName(index) : "Gamepad button "+index;
+		}
+		@Override
+		public String serialize() {
+			return "cb"+index;
 		}
 	}
 	
