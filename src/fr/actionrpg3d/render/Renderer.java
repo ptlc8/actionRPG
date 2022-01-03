@@ -6,6 +6,7 @@ import org.lwjgl.opengl.Display;
 
 import fr.actionrpg3d.game.Dungeon;
 import fr.actionrpg3d.game.Game;
+import fr.actionrpg3d.game.Wave;
 import fr.actionrpg3d.game.collision.Prism;
 import fr.actionrpg3d.game.entities.Creature;
 import fr.actionrpg3d.game.entities.Entity;
@@ -20,6 +21,9 @@ public class Renderer {
 	
 	public static void renderGUI(Game game, Camera camera) {
 		float aspect = (float)Display.getWidth()/(float)Display.getHeight();
+		Wave wave = game.getCurrentWave();
+		if (wave != null)
+			renderWaveBar(wave.size()*1f/wave.getInitialSize(), aspect);
 		if (camera instanceof FirstPersonCamera || camera instanceof ThirdPersonCamera) {
 			Creature creature = camera instanceof FirstPersonCamera ? ((FirstPersonCamera)camera).getFollowed() : ((ThirdPersonCamera)camera).getFollowed();
 			float health = (float) creature.getHealth() / creature.getMaxHealth();
@@ -28,7 +32,7 @@ public class Renderer {
 				float cooldown = (float) ((Player)creature).getCooldown() / ((Player)creature).getWeapon().getCooldown();
 				renderPlayerCooldown(cooldown, aspect);
 			}*/
-			glColor3f(.7f, .7f, .7f); // blanc cass�
+			glColor3f(.7f, .7f, .7f); // blanc cassé
 			glBegin(GL_LINES);
 			glVertex2f(-.02f, 0);
 			glVertex2f(.02f, 0);
@@ -48,7 +52,7 @@ public class Renderer {
 		glVertex2f(-.95f+.675f*health, -.95f);
 		glVertex2f(-.95f+.625f*health, -.85f);
 		glEnd();
-		glColor3f(.7f, .7f, .7f); // blanc cass�
+		glColor3f(.7f, .7f, .7f); // blanc cassé
 		glBegin(GL_QUADS);
 		glVertex2f(-1, -.8f);
 		glVertex2f(-1, -1);
@@ -57,7 +61,7 @@ public class Renderer {
 		glEnd();
 	}
 	
-	/*private static void renderPlayerCooldown(float cooldown, float aspect) {
+	private static void renderPlayerCooldown(float cooldown, float aspect) {
 		glColor3f(.7f, .7f, .1f); // jaune
 		glBegin(GL_QUADS);
 		glVertex2f(.95f, -.975f);
@@ -65,14 +69,34 @@ public class Renderer {
 		glVertex2f(.95f-.625f*cooldown, -.875f);
 		glVertex2f(.95f-.675f*cooldown, -.975f);
 		glEnd();
-		glColor3f(.7f, .7f, .7f); // blanc cass�
+		glColor3f(.7f, .7f, .7f); // blanc cassé
 		glBegin(GL_QUADS);
 		glVertex2f(1, -1);
 		glVertex2f(1, -.85f);
 		glVertex2f(.3f, -.85f);
 		glVertex2f(.2f, -1);
 		glEnd();
-	}*/
+	}
+	
+	private static void renderWaveBar(float progress, float aspect) {
+		renderWaveBar(progress, aspect, new Vector3f());
+	}
+	private static void renderWaveBar(float progress, float aspect, Vector3f color) {
+		glColor3f(color.getX(), color.getY(), color.getZ());
+		glBegin(GL_QUADS);
+		glVertex2f(-.45f+.9f*progress, .875f);
+		glVertex2f(-.55f+1.1f*progress, .975f);
+		glVertex2f(-.55f, .975f);
+		glVertex2f(-.45f, .875f);
+		glEnd();
+		glColor3f(.7f, .7f, .7f); // blanc cassé
+		glBegin(GL_QUADS);
+		glVertex2f(.45f, .85f);
+		glVertex2f(.6f, 1);
+		glVertex2f(-.6f, 1);
+		glVertex2f(-.45f, .85f);
+		glEnd();
+	}
 	
 	public static void render(Game game) {
 		

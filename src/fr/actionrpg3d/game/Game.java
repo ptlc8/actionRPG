@@ -33,7 +33,7 @@ public class Game {
 	private List<Entity> entities = new ArrayList<Entity>();
 	private List<Entity> entitiesToAdd = new ArrayList<Entity>();
 	private List<Entity> entitiesToRemove = new ArrayList<Entity>();
-	private List<Entity> currentWave = null;
+	private Wave currentWave = null;
 	
 	private final Camera camera;
 	
@@ -74,19 +74,6 @@ public class Game {
 			if (entity instanceof Controlable) ((Controlable)entity).updateControlable();
 			if (entity instanceof AI) ((AI)entity).updateAI(entities);
 			if (entity instanceof Moveable) ((Moveable)entity).updateMove(dungeon);
-			if (entity instanceof Player) {
-				Room room = dungeon.getRoom(entity.getPosition().getX()/2, entity.getPosition().getZ()/2);
-				if (room != null && !room.isClear() && (currentWave==null || currentWave.size()==0)) { // new wave
-					if (room.getWavesNumber() == 0) {
-						System.out.println("Salle termin�e");
-						currentWave = null;
-						room.setClear(true);
-					} else {
-						System.out.println("Vague "+room.getWavesNumber());
-						currentWave = room.getWave();
-					}
-				}
-			}
 		}
 		for (Iterator<Entity> it = entitiesToAdd.iterator(); it.hasNext(); it.remove()) {
 			Entity entity = it.next();
@@ -96,13 +83,39 @@ public class Game {
 			Entity entity = it.next();
 			entities.remove(entity);
 		}
+		updateRoom();
 		//((Modelizable)entities.get(1)).getRotation().add(new Vector3f(2f,1f,3f)); // TODO : debug only
+	}
+	
+	private void updateRoom() {
+		Room room = getCurrentRoom();
+		if (room != null && !room.isClear() && (currentWave==null || currentWave.size()==0)) {
+			if (currentWave!=null) room.clearWave();
+			if (room.isClear()) {
+				System.out.println("Salle terminée");
+				currentWave = null;
+			} else {
+				System.out.println("Vague "+(room.getClearedWaves()+1)+"/"+room.getWavesNumber());
+				currentWave = room.createWave(this);
+			}
+		}
 	}
 	
 	public Dungeon getDungeon() {
 		return dungeon;
 	}
-
+	
+	public Room getCurrentRoom() {
+		for (Entity entity : entities)
+			if (entity instanceof Player)
+				return dungeon.getRoom(entity.getPosition().getX()/2, entity.getPosition().getZ()/2);
+		return null;
+	}
+	
+	public Wave getCurrentWave() {
+		return currentWave;
+	}
+	
 	public List<Entity> getEntities() {
 		return Collections.unmodifiableList(entities);
 	}

@@ -1,9 +1,7 @@
 package fr.actionrpg3d.game;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import fr.actionrpg3d.game.entities.Entity;
 import fr.actionrpg3d.math.Vector2f;
 
 public class Room {
@@ -14,8 +12,7 @@ public class Room {
 	
 	private boolean treasure = false;
 	private int waves = 1;
-	private boolean clear = false;
-	
+	private int clearedWaves = 0;
 	
 	public Room(int x, int z, int width, int height, List<Vector2f> doors, boolean treasure, int waves) {
 		this.x = x;
@@ -64,15 +61,18 @@ public class Room {
 	}
 
 	public boolean isClear() {
-		return clear;
+		return waves == clearedWaves;
 	}
 	
-	public List<Entity> getWave() {
-		waves--;
-		return new ArrayList<>(); // TODO
+	public Wave createWave(Game game) {
+		return new Wave(game, this, 10); // TODO
 	}
-
-	public void setClear(boolean clear) {
-		this.clear = clear;
+	
+	public int getClearedWaves() {
+		return clearedWaves;
+	}
+	
+	public void clearWave() {
+		clearedWaves++;
 	}
 }
