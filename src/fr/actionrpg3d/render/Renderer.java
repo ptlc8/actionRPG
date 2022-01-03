@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.Display;
 
 import fr.actionrpg3d.game.Dungeon;
-import fr.actionrpg3d.game.Game;
+import fr.actionrpg3d.game.RenderedGame;
 import fr.actionrpg3d.game.Wave;
 import fr.actionrpg3d.game.collision.Prism;
 import fr.actionrpg3d.game.entities.Creature;
@@ -19,9 +19,9 @@ import fr.actionrpg3d.render.Model.Shape;
 
 public class Renderer {
 	
-	public static void renderGUI(Game game, Camera camera) {
+	public static void renderGUI(RenderedGame rGame, Camera camera) {
 		float aspect = (float)Display.getWidth()/(float)Display.getHeight();
-		Wave wave = game.getCurrentWave();
+		Wave wave = rGame.getGame().getCurrentWave();
 		if (wave != null)
 			renderWaveBar(wave.size()*1f/wave.getInitialSize(), aspect);
 		if (camera instanceof FirstPersonCamera || camera instanceof ThirdPersonCamera) {
@@ -98,13 +98,13 @@ public class Renderer {
 		glEnd();
 	}
 	
-	public static void render(Game game) {
+	public static void render(RenderedGame rGame) {
 		
-		for (Entity entity : game.getEntities()) {
+		for (Entity entity : rGame.getGame().getEntities()) {
 			if (entity instanceof Modelizable) {
-				if (!(game.getCamera() instanceof FirstPersonCamera && ((FirstPersonCamera)game.getCamera()).getFollowed()==entity))
+				if (!(rGame.getCamera() instanceof FirstPersonCamera && ((FirstPersonCamera)rGame.getCamera()).getFollowed()==entity))
 					render(((Modelizable)entity).getModel(), entity.getPosition(), ((Modelizable)entity).getRotation());
-				if (game.isDebug() && entity instanceof Tangible)
+				if (rGame.isDebug() && entity instanceof Tangible)
 					render(((Tangible)entity).getHitbox(), entity.getPosition());
 				if (entity instanceof Player && ((Player)entity).getWeapon()!=null) {
 					Player player = (Player)entity;
@@ -113,7 +113,7 @@ public class Renderer {
 			}
 		}		
 		
-		int [][] map = game.getDungeon().getPattern();
+		int [][] map = rGame.getGame().getDungeon().getPattern();
 		for(int i = 0; i < map.length; i++) {
 			for (int j = 0; j < map[i].length; j++) {
 				renderTile(j, i, map[i][j], i>=map.length-1?0:map[i+1][j], j>=(map.length==0?0:map[0].length-1)?0:map[i][j+1], i<=0?0:map[i-1][j], j<=0?0:map[i][j-1]);

@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.glu.GLU;
 
+import fr.actionrpg3d.inputs.Controls;
 import fr.actionrpg3d.math.Vector3f;
 
 public abstract class Camera {
@@ -42,7 +43,7 @@ public abstract class Camera {
 		glPopMatrix();						// inutile ?
 	}
 	
-	public abstract void update();
+	public abstract void update(Controls controls);
 
 	public Vector3f getPosition() {
 		return pos;

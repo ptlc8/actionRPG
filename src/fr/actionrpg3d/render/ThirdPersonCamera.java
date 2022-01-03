@@ -1,6 +1,7 @@
 package fr.actionrpg3d.render;
 
 import fr.actionrpg3d.game.entities.Creature;
+import fr.actionrpg3d.inputs.Controls;
 import fr.actionrpg3d.math.Vector3f;
 
 public class ThirdPersonCamera extends Camera {
@@ -16,7 +17,7 @@ public class ThirdPersonCamera extends Camera {
 	}
 
 	@Override
-	public void update() {
+	public void update(Controls controls) {
 		if (followed == null) return;
 		getPosition().set(followed.getPosition()).add(relativePosition).mul(-1f);
 	}

@@ -1,13 +1,11 @@
 package fr.actionrpg3d.game.entities;
 
-import fr.actionrpg3d.game.Controls;
+import fr.actionrpg3d.inputs.Controls;
 import fr.actionrpg3d.math.Vector3f;
 
 public interface FirstPersonControlable extends Controlable {
 	
-	default void updateControlable() {
-		Controls controls = getControls();
-		controls.poll();
+	default void updateControlable(Controls controls) {
 		Vector3f move = new Vector3f();
 		Vector3f rot = getRotation();
 		//if (Mouse.isButtonDown(0)) {

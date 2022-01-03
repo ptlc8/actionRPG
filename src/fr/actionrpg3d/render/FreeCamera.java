@@ -1,24 +1,20 @@
 package fr.actionrpg3d.render;
 
-import fr.actionrpg3d.game.Controls;
+import fr.actionrpg3d.inputs.Controls;
 import fr.actionrpg3d.math.Vector3f;
 
 public class FreeCamera extends Camera {
 	
-	private Controls controls;
-	
-	public FreeCamera(Vector3f position, Controls controls) {
+	public FreeCamera(Vector3f position) {
 		super(position);
-		this.controls = controls;
 	}
 	
 	private float speed = .2f;
 
 	@Override
-	public void update() {
+	public void update(Controls controls) {
 		Vector3f position = getPosition();
 		Vector3f rotation = getRotation();
-		controls.poll();
 		// control rotation
 		rotation.addX(-controls.getCameraXAxis()*2);
 		rotation.addY(controls.getCameraYAxis()*3);

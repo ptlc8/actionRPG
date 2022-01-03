@@ -1,4 +1,4 @@
-package fr.actionrpg3d.game;
+package fr.actionrpg3d.inputs;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,12 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.lwjgl.input.Controllers;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-public class Controls {
+public class PhysicInputs {
 	
 	private static int controllerIndex = 0;
 	
@@ -28,8 +27,8 @@ public class Controls {
 		}
 	}
 	
-	public static Input getLastInput() {
-		Input input = null;
+	public static PhysicInput getLastInput() {
+		PhysicInput input = null;
 		long inputTime = 0;
 		// Keyboard events
 		int key = -1;
@@ -82,30 +81,25 @@ public class Controls {
 		return input;
 	}
 	
-	public Map<String, List<Input>> inputs;
-	
-	private float leftRightAxis=0, backwardForwardAxis=0, downUpAxis=0, cameraXAxis=0, cameraYAxis=0;
-	private boolean action=false;
-	
+	public Map<String, List<PhysicInput>> physicInputs;
 	private static float MouseDX=0, MouseDY=0, MouseDWheel=0;
 	
-	public Controls() {
-		inputs = new HashMap<>();
-		inputs.put("left", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_Q), new ControllerAxisInput(0, false))));
-		inputs.put("right", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_D), new ControllerAxisInput(0, true))));
-		inputs.put("forward", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_Z), new ControllerAxisInput(1, false))));
-		inputs.put("backward", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_S), new ControllerAxisInput(1, true))));
-		inputs.put("up", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_SPACE), new ControllerButtonInput(8))));
-		inputs.put("down", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_LSHIFT), new ControllerButtonInput(6))));
-		inputs.put("action", new ArrayList<>(Arrays.asList(new MouseButtonInput(0), new ControllerButtonInput(9))));
-		inputs.put("cameraXneg", new ArrayList<>(Arrays.asList(new MouseAxisInput(1, false), new ControllerAxisInput(3, true))));
-		inputs.put("cameraXpos", new ArrayList<>(Arrays.asList(new MouseAxisInput(1, true), new ControllerAxisInput(3, false))));
-		inputs.put("cameraYneg", new ArrayList<>(Arrays.asList(new MouseAxisInput(0, false), new ControllerAxisInput(2, false))));
-		inputs.put("cameraYpos", new ArrayList<>(Arrays.asList(new MouseAxisInput(0, true), new ControllerAxisInput(2, true))));
-		poll();
+	public PhysicInputs() {
+		physicInputs = new HashMap<>();
+		physicInputs.put("left", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_Q), new ControllerAxisInput(0, false))));
+		physicInputs.put("right", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_D), new ControllerAxisInput(0, true))));
+		physicInputs.put("forward", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_Z), new ControllerAxisInput(1, false))));
+		physicInputs.put("backward", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_S), new ControllerAxisInput(1, true))));
+		physicInputs.put("up", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_SPACE), new ControllerButtonInput(8))));
+		physicInputs.put("down", new ArrayList<>(Arrays.asList(new KeyBoardInput(Keyboard.KEY_LSHIFT), new ControllerButtonInput(6))));
+		physicInputs.put("action", new ArrayList<>(Arrays.asList(new MouseButtonInput(0), new ControllerButtonInput(9))));
+		physicInputs.put("cameraXneg", new ArrayList<>(Arrays.asList(new MouseAxisInput(1, false), new ControllerAxisInput(3, true))));
+		physicInputs.put("cameraXpos", new ArrayList<>(Arrays.asList(new MouseAxisInput(1, true), new ControllerAxisInput(3, false))));
+		physicInputs.put("cameraYneg", new ArrayList<>(Arrays.asList(new MouseAxisInput(0, false), new ControllerAxisInput(2, false))));
+		physicInputs.put("cameraYpos", new ArrayList<>(Arrays.asList(new MouseAxisInput(0, true), new ControllerAxisInput(2, true))));
 	}
 	
-	public Controls(File file) {
+	public PhysicInputs(File file) {
 		this();
 		if (!file.exists())
 			return;
@@ -116,11 +110,11 @@ public class Controls {
 			while ((line = reader.readLine()) != null) {
 				if (line.endsWith("=")) {
 					inputName = line.substring(0, line.length()-1);
-					if (inputs.get(inputName)==null)
-						inputs.put(inputName, new ArrayList<>());
-					inputs.get(inputName).clear();
+					if (physicInputs.get(inputName)==null)
+						physicInputs.put(inputName, new ArrayList<>());
+					physicInputs.get(inputName).clear();
 				} else {
-					inputs.get(inputName).add(Input.unserialize(line));
+					physicInputs.get(inputName).add(PhysicInput.unserialize(line));
 				}
 			}
 			reader.close();
@@ -130,22 +124,10 @@ public class Controls {
 		}
 	}
 	
-	public void poll() {
-		MouseDX = Mouse.getDX()/6f;
-		MouseDY = Mouse.getDY()/6f;
-		MouseDWheel = Mouse.getDWheel()/10f;
-		leftRightAxis = getInputValue("right") - getInputValue("left");
-		backwardForwardAxis = getInputValue("forward") - getInputValue("backward");
-		downUpAxis = getInputValue("up") - getInputValue("down");
-		cameraXAxis = getInputValue("cameraXpos") - getInputValue("cameraXneg");
-		cameraYAxis = getInputValue("cameraYpos") - getInputValue("cameraYneg");
-		action = getInputValue("action")>0;
-	}
-	
-	private float getInputValue(String name) {
-		List<Input> inputs = this.inputs.get(name);
+	private float getPhysicInputValue(String name) {
+		List<PhysicInput> inputs = this.physicInputs.get(name);
 		float value = 0f;
-		for (Input input : inputs)
+		for (PhysicInput input : inputs)
 			if (input.getValue() > value)
 				value = input.getValue();
 		return value;
@@ -156,9 +138,9 @@ public class Controls {
 			if (!file.exists())
 			file.createNewFile();
 			PrintWriter writer = new PrintWriter(file);
-			for (Entry<String, List<Input>> e : inputs.entrySet()) {
+			for (Entry<String, List<PhysicInput>> e : physicInputs.entrySet()) {
 				writer.append(e.getKey()+"=\n");
-				for (Input i : e.getValue())
+				for (PhysicInput i : e.getValue())
 					writer.append(i.serialize()+"\n");
 			}
 			writer.close();
@@ -167,54 +149,25 @@ public class Controls {
 		}
 	}
 	
-	public float getLeftRightAxis() {
-		return leftRightAxis;
-	}
-	public float getLeft() {
-		return Math.max(0, -leftRightAxis);
-	}
-	public float getRight() {
-		return Math.max(0, leftRightAxis);
-	}
-	
-	public float getBackwardForwardAxis() {
-		return backwardForwardAxis;
-	}
-	public float getForward() {
-		return Math.max(0, backwardForwardAxis);
-	}
-	public float getBackward() {
-		return Math.max(0, -backwardForwardAxis);
+	public Controls getControls() {
+		MouseDX = Mouse.getDX()/6f;
+		MouseDY = Mouse.getDY()/6f;
+		MouseDWheel = Mouse.getDWheel()/10f;
+		Controls controls = new Controls(
+				getPhysicInputValue("right") - getPhysicInputValue("left"),
+				getPhysicInputValue("forward") - getPhysicInputValue("backward"),
+				getPhysicInputValue("up") - getPhysicInputValue("down"),
+				getPhysicInputValue("cameraXpos") - getPhysicInputValue("cameraXneg"),
+				getPhysicInputValue("cameraYpos") - getPhysicInputValue("cameraYneg"),
+				getPhysicInputValue("action")>0);
+		return controls;
 	}
 	
-	public float getDownUpAxis() {
-		return downUpAxis;
-	}
-	public float getUp() {
-		return Math.max(0, downUpAxis);
-	}
-	public float getDown() {
-		return Math.max(0, -downUpAxis);
-	}
-	
-	public float getCameraXAxis() {
-		return cameraXAxis;
-	}
-	
-	public float getCameraYAxis() {
-		return cameraYAxis;
-	}
-	
-	public boolean getAction() {
-		return action;
-	}
-	
-	
-	private static abstract class Input {
+	private static abstract class PhysicInput {
 		abstract float getValue();
 		abstract String getName();
 		abstract String serialize();
-		static Input unserialize(String str) {
+		static PhysicInput unserialize(String str) {
 			String prefix = str.substring(0,2);
 			boolean positive = str.endsWith("+");
 			int value = Integer.parseInt(str.substring(2,str.length()-(str.endsWith("+")||str.endsWith("-")?1:0)));
@@ -235,7 +188,7 @@ public class Controls {
 		}
 	}
 	
-	static class KeyBoardInput extends Input {
+	static class KeyBoardInput extends PhysicInput {
 		private int key;
 		public KeyBoardInput(int key) {
 			this.key = key;
@@ -254,7 +207,7 @@ public class Controls {
 		}
 	}
 	
-	static class MouseButtonInput extends Input {
+	static class MouseButtonInput extends PhysicInput {
 		private int button;
 		public MouseButtonInput(int button) {
 			this.button = button;
@@ -273,7 +226,7 @@ public class Controls {
 		}
 	}
 	
-	static class MouseAxisInput extends Input {
+	static class MouseAxisInput extends PhysicInput {
 		private int axis;
 		private boolean positive;
 		public MouseAxisInput(int axis, boolean positive) {
@@ -295,7 +248,7 @@ public class Controls {
 		}
 	}
 	
-	static class ControllerAxisInput extends Input {
+	static class ControllerAxisInput extends PhysicInput {
 		private int index;
 		private boolean positive;
 		public ControllerAxisInput(int index, boolean positive) {
@@ -318,7 +271,7 @@ public class Controls {
 		}
 	}
 	
-	static class ControllerButtonInput extends Input {
+	static class ControllerButtonInput extends PhysicInput {
 		private int index;
 		public ControllerButtonInput(int index) {
 			this.index = index;

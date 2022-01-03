@@ -1,6 +1,8 @@
 package fr.actionrpg3d;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.lwjgl.LWJGLException;
 
@@ -12,14 +14,13 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
-import fr.actionrpg3d.game.Controls;
 import fr.actionrpg3d.game.Game;
+import fr.actionrpg3d.game.RenderedGame;
+import fr.actionrpg3d.inputs.Controls;
+import fr.actionrpg3d.inputs.PhysicInputs;
 import fr.actionrpg3d.render.Camera;
 import fr.actionrpg3d.render.FirstPersonCamera;
-import fr.actionrpg3d.render.FreeCamera;
-import fr.actionrpg3d.render.ThirdPersonCamera;
 import fr.actionrpg3d.render.Renderer;
-import fr.actionrpg3d.math.Vector3f;
 
 public class Main {
 	
@@ -30,6 +31,8 @@ public class Main {
 	
 	private static Camera camera;
 	private static Game game;
+	private static RenderedGame renderedGame;
+	private static PhysicInputs controlsOrigin;
 	
 	public static void main(String[] args) {
 		
@@ -101,28 +104,32 @@ public class Main {
 		//camera = new ThirdPersonCamera(new Vector3f(0, 8, 0));
 		//camera = new FreeCamera(new Vector3f(0, -5, 0), new Controls());
 		camera.setPerspectiveProjection(70f, 0.1f, 100f);
-		game = new Game(camera);
+		game = new Game();
+		renderedGame = new RenderedGame(camera, game, 0);
 		try {
 			Controllers.create();
-			Controls.refreshControllerIndex();
+			PhysicInputs.refreshControllerIndex();
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
+		controlsOrigin = new PhysicInputs(new File("controls"));
 	}
 	
 	private static void render() {
 		if (Display.wasResized()) glViewport(0, 0, Display.getWidth(), Display.getHeight());
 		GL11.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		GL11.glLoadIdentity();
-		Renderer.renderGUI(game, camera);
+		Renderer.renderGUI(renderedGame, camera);
 		camera.getPerspectiveProjection();
 		camera.render();
-		Renderer.render(game);
+		Renderer.render(renderedGame);
 	}
 	
 	private static void update() {
-		camera.update();
-		game.update();
+		Map<Integer,Controls> controlsMap = new HashMap<>();
+		controlsMap.put(0, controlsOrigin.getControls());
+		camera.update(controlsMap.get(0));
+		game.update(controlsMap);
 	}
 	
 	public static String getOS() {

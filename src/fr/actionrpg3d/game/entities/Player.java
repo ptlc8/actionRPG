@@ -1,11 +1,11 @@
 package fr.actionrpg3d.game.entities;
 
-import fr.actionrpg3d.game.Controls;
 import fr.actionrpg3d.game.Game;
 import fr.actionrpg3d.game.collision.Prism;
 import fr.actionrpg3d.game.collision.Shape;
 import fr.actionrpg3d.game.items.InfightWeapon;
 import fr.actionrpg3d.game.items.Weapon;
+import fr.actionrpg3d.inputs.Controls;
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Model;
 
@@ -16,13 +16,13 @@ public class Player extends Creature implements FirstPersonControlable {
 	private static final Prism hitbox = new Prism(new Shape.RegularPolygon(8, .5f), 2);
 	private static final Weapon defaultWeapon = new InfightWeapon(new Model("/models/stick.model"), 2, 10, 60, 0.5f);
 	
-	private Controls controls = null;
+	private int playerId;
 	private Weapon weapon = defaultWeapon; // @NonNullable
 	private int cooldown = 0;
 	
-	public Player(Game game, Vector3f position, Model model, Controls controls) {
+	public Player(Game game, int playerId, Vector3f position, Model model) {
 		super(game, position, model, hitbox, health);
-		this.controls = controls;
+		this.playerId = playerId;
 	}
 	
 	private void attack() {
@@ -33,18 +33,17 @@ public class Player extends Creature implements FirstPersonControlable {
 	}
 	
 	@Override
-	public void updateControlable() {
-		FirstPersonControlable.super.updateControlable();
+	public void updateControlable(Controls controls) {
+		FirstPersonControlable.super.updateControlable(controls);
 		if (cooldown < weapon.getCooldown()) cooldown++;
 		if (controls.getAction()) {
 			attack();
-			// TODO : actions de clic
 		}
 	}
 	
 	@Override
-	public Controls getControls() {
-		return controls;
+	public int getControlsId() {
+		return playerId;
 	}
 	
 	public Vector3f getHandPosition() {

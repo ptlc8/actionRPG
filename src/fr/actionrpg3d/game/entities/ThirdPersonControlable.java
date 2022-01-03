@@ -1,13 +1,11 @@
 package fr.actionrpg3d.game.entities;
 
-import fr.actionrpg3d.game.Controls;
+import fr.actionrpg3d.inputs.Controls;
 import fr.actionrpg3d.math.Vector3f;
 
 public interface ThirdPersonControlable extends Controlable {
 	
-	default void updateControlable() {
-		Controls controls = getControls();
-		controls.poll();
+	default void updateControlable(Controls controls) {
 		Vector3f move = new Vector3f();
 		if (controls.getForward()>0) {
 			move.subZ(1f);
