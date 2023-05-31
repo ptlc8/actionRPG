@@ -1,8 +1,8 @@
 package fr.actionrpg3d.render;
 
+import fr.actionrpg3d.game.Controls;
 import fr.actionrpg3d.game.entities.Creature;
 import fr.actionrpg3d.game.entities.Modelizable;
-import fr.actionrpg3d.inputs.Controls;
 import fr.actionrpg3d.math.Vector3f;
 
 public class FirstPersonCamera extends Camera {

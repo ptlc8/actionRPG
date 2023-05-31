@@ -182,4 +182,16 @@ public class Vector3f implements Cloneable {
 		return "("+x+","+y+","+z+")";
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (obj == this)
+			return true;
+		if (!(obj instanceof Vector3f))
+			return false;
+		Vector3f other = (Vector3f) obj;
+		return x == other.x && y == other.y && z == other.z;
+	}
+	
 }

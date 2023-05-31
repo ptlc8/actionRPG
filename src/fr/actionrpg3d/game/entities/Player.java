@@ -1,11 +1,11 @@
 package fr.actionrpg3d.game.entities;
 
+import fr.actionrpg3d.game.Controls;
 import fr.actionrpg3d.game.Game;
 import fr.actionrpg3d.game.collision.Prism;
 import fr.actionrpg3d.game.collision.Shape;
 import fr.actionrpg3d.game.items.InfightWeapon;
 import fr.actionrpg3d.game.items.Weapon;
-import fr.actionrpg3d.inputs.Controls;
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Model;
 

@@ -172,4 +172,16 @@ public class Vector2f {
 		return "("+x+","+y+")";
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (obj == this)
+			return true;
+		if (!(obj instanceof Vector2f))
+			return false;
+		Vector2f other = (Vector2f) obj;
+		return x == other.x && y == other.y;
+	}
+	
 }

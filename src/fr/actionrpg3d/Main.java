@@ -1,149 +1,25 @@
 package fr.actionrpg3d;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.lwjgl.LWJGLException;
-
-import static org.lwjgl.opengl.GL11.*;
-
-import org.lwjgl.input.Controllers;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
-
-import fr.actionrpg3d.game.Game;
-import fr.actionrpg3d.game.RenderedGame;
-import fr.actionrpg3d.inputs.Controls;
-import fr.actionrpg3d.inputs.PhysicInputs;
-import fr.actionrpg3d.render.Camera;
-import fr.actionrpg3d.render.FirstPersonCamera;
-import fr.actionrpg3d.render.Renderer;
+import java.util.Scanner;
 
 public class Main {
 	
 	private static final String VERSION = "0.1.0";
 	private static final String DATE = "27/05/2020";
 	
-	private static boolean running = true;
-	
-	private static Camera camera;
-	private static Game game;
-	private static RenderedGame renderedGame;
-	private static PhysicInputs controlsOrigin;
-	
-	public static void main(String[] args) {
-		
-		System.setProperty("org.lwjgl.librarypath", new File("native/"+getOS()).getAbsolutePath());
-		System.setProperty("net.java.games.input.librarypath", new File("native/"+getOS()).getAbsolutePath());
+	@SuppressWarnings("resource")
+	public static void main(String[] args) throws Exception {
 		System.out.println("\"actionrpg3d\" " + VERSION + ", par PTLC_, le " + DATE + ", pour tous, vive l'Amour !");
-		
-		try {
-			Display.setDisplayMode(new DisplayMode(720, 480));
-			Display.setTitle("ActionRPG3D");
-			Display.setResizable(true);
-			Display.create();
-			
-			glEnable(GL_DEPTH_TEST);
-			glEnable(GL_CULL_FACE); // X-ray ?
-			
-			int FRAME_CAP = 120;
-			long lastUpdate = System.nanoTime();
-			long lastRender = System.nanoTime();
-			double updateTime = 1_000_000_000.0 / 60.0; // TPS
-			double renderTime = 1_000_000_000.0 / FRAME_CAP;
-			int ticks = 0, frames = 0;
-			long timer = System.currentTimeMillis();
-			
-			onStart();
-			
-			while (running) {
-				boolean rendered = false;
-				if (Display.isCloseRequested()) running = false;
-				if (System.nanoTime() - lastUpdate > updateTime) {
-					update();
-					Display.update();
-					ticks++;
-					lastUpdate += updateTime;
-				}
-				if (System.nanoTime() - lastRender > renderTime) {
-					render();
-					frames++;
-					lastRender += renderTime;
-					rendered = true;
-				}
-				if (System.currentTimeMillis() - timer > 1000) {
-					System.out.println("TPS : " + ticks + " ; FPS : " + frames);
-					ticks = frames = 0;
-					timer = System.currentTimeMillis();
-				}
-				if (rendered) {
-					try {
-						Thread.sleep((int)(1000.0/FRAME_CAP));
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			
-			
-			Display.destroy();
-			System.exit(0);
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
+		System.out.println("1: solo");
+		System.out.println("2: client");
+		System.out.println("3: server");
+		int choice = new Scanner(System.in).nextInt();
+		if (choice == 1)
+			new Client().joinSolo();
+		if (choice == 2)
+			new Client().joinServer();
+		if (choice == 3)
+			new Server();
 	}
-	
-	
-	private static void onStart() {
-		Mouse.setCursorPosition(Display.getWidth()/2, Display.getHeight()/2);
-		Mouse.setGrabbed(true);
-		camera = new FirstPersonCamera(1.6f);
-		//camera = new ThirdPersonCamera(new Vector3f(0, 8, 0));
-		//camera = new FreeCamera(new Vector3f(0, -5, 0), new Controls());
-		camera.setPerspectiveProjection(70f, 0.1f, 100f);
-		game = new Game();
-		renderedGame = new RenderedGame(camera, game, 0);
-		try {
-			Controllers.create();
-			PhysicInputs.refreshControllerIndex();
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
-		controlsOrigin = new PhysicInputs(new File("controls"));
-	}
-	
-	private static void render() {
-		if (Display.wasResized()) glViewport(0, 0, Display.getWidth(), Display.getHeight());
-		GL11.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		GL11.glLoadIdentity();
-		Renderer.renderGUI(renderedGame, camera);
-		camera.getPerspectiveProjection();
-		camera.render();
-		Renderer.render(renderedGame);
-	}
-	
-	private static void update() {
-		Map<Integer,Controls> controlsMap = new HashMap<>();
-		controlsMap.put(0, controlsOrigin.getControls());
-		camera.update(controlsMap.get(0));
-		game.update(controlsMap);
-	}
-	
-	public static String getOS() {
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) {
-            return "windows";
-        } else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
-            return "linux";
-        } else if (os.contains("mac")) {
-            return "mac";
-        } else if (os.contains("sunos")) {
-            return "solaris";
-        }
-        return "unknow";
-    }
-	
+
 }

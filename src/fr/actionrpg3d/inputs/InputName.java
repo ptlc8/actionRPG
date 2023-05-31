@@ -1,6 +1,6 @@
 package fr.actionrpg3d.inputs;
 
-public enum Action {
+public enum InputName {
 	
 	LEFT("left"),
 	RIGHT("right"),
@@ -17,7 +17,7 @@ public enum Action {
 	
 	private String name;
 	
-	Action(String name) {
+	InputName(String name) {
 		this.name = name;
 	}
 	

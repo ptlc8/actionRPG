@@ -6,10 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-
 import fr.actionrpg3d.game.entities.AI;
 import fr.actionrpg3d.game.entities.Controlable;
 import fr.actionrpg3d.game.entities.Entity;
@@ -19,7 +15,6 @@ import fr.actionrpg3d.game.entities.Player;
 import fr.actionrpg3d.game.entities.Skeleton;
 import fr.actionrpg3d.game.entities.Statue;
 import fr.actionrpg3d.game.entities.Wizard;
-import fr.actionrpg3d.inputs.Controls;
 import fr.actionrpg3d.math.Vector2f;
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Model;
@@ -28,6 +23,7 @@ public class Game {
 	
 	private int tick = 0;
 	private Dungeon dungeon;
+	private final int seed;
 	
 	private Map<Integer, Player> players = new HashMap<>();
 	private List<Entity> entities = new ArrayList<Entity>();
@@ -38,38 +34,32 @@ public class Game {
 	private boolean paused = false;
 	private boolean debug = false;
 	
-	public Game() {
-		int seed = -1984888624; //new Random().nextInt();
+	
+	public Game(int seed) {
+		this.seed = seed; 
+		//new Random().nextInt();
 		System.out.println("Seed : " + seed);
 		// dungeon = DungeonGenerator.generate(seed, 101, 101, 8, 15, 7, 51, 0.4f);
 		dungeon = DungeonGenerator.generate(seed, 101, 101, 16, 32, 7, 21, 0.4f);
 		// TODO : rien pour l'instant
-		Player player;
 		Vector2f startPoint = dungeon.getStartPoint().mul(2); //new Vector2f(-2, -4);
-		entities.add(player = new Player(this, 0, new Vector3f(startPoint.getX(), 1, startPoint.getY()), new Model("/models/robot.model")));
-		players.put(0, player);
 		//entities.add(new Entity(this, new Vector3f(0, 5, 0), new Model("/models/cube.model")));
 		entities.add(new Wizard(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
 		entities.add(new Statue(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
 		entities.add(new Skeleton(this, new Vector3f(startPoint.getX(), 1, startPoint.getY())));
 	}
 	
-	private boolean echaping = false; // tmp ?
-	
 	public void update(Map<Integer, Controls> controls) {
-		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && !echaping){
-			echaping = true;
-			if (paused) resume();
-			else pause();
-		} else if (echaping && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-			echaping = false;
-		}
+		tick++;
 		if (paused) return;
 		for (Entity entity : entities) {
 			if (entity instanceof Gravity)
 				((Gravity)entity).updateGravity();
-			if (entity instanceof Controlable)
-				((Controlable)entity).updateControlable(controls.get(((Controlable)entity).getControlsId()));
+			if (entity instanceof Controlable) {
+				Controls contr0ls = controls.get(((Controlable)entity).getControlsId());
+				if (contr0ls != null)
+					((Controlable)entity).updateControlable(contr0ls);
+			}
 			if (entity instanceof AI)
 				((AI)entity).updateAI(entities);
 			if (entity instanceof Moveable)
@@ -84,8 +74,6 @@ public class Game {
 			entities.remove(entity);
 		}
 		updateRoom();
-		//((Modelizable)entities.get(1)).getRotation().add(new Vector3f(2f,1f,3f)); // TODO : debug only
-		tick++;
 	}
 	
 	private void updateRoom() {
@@ -102,12 +90,34 @@ public class Game {
 		}
 	}
 	
+	public boolean addPlayer(int playerId) {
+		if (players.containsKey(playerId))
+			return false;
+		Vector2f startPoint = dungeon.getStartPoint().mul(2);
+		Player player = new Player(this, playerId, new Vector3f(startPoint.getX(), 1, startPoint.getY()), new Model("/models/robot.model"));
+		entities.add(player);
+		players.put(playerId, player);
+		return true;
+	}
+	
+	public boolean removePlayer(int playerId) {
+		if (!players.containsKey(playerId))
+			return false;
+		entities.remove(players.get(playerId));
+		players.remove(playerId);
+		return true;
+	}
+	
 	public int getTick() {
 		return tick;
 	}
 	
 	public Map<Integer, Player> getPlayers() {
 		return Collections.unmodifiableMap(players);
+	}
+	
+	public int getSeed() {
+		return seed;
 	}
 	
 	public Dungeon getDungeon() {
@@ -143,13 +153,10 @@ public class Game {
 
 	public void pause() {
 		paused = true;
-		Mouse.setGrabbed(false);
 	}
 	
 	public void resume() {
 		paused = false;
-		Mouse.setCursorPosition(Display.getWidth()/2, Display.getHeight()/2);
-		Mouse.setGrabbed(true);
 	}
 	
 	public boolean isDebug() {

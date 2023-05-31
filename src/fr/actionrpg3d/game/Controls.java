@@ -1,4 +1,4 @@
-package fr.actionrpg3d.inputs;
+package fr.actionrpg3d.game;
 
 public class Controls {
 	
@@ -13,7 +13,7 @@ public class Controls {
 		this.cameraYAxis = cameraYAxis;
 		this.action = action;
 	}
-
+	
 	public float getLeftRightAxis() {
 		return leftRightAxis;
 	}

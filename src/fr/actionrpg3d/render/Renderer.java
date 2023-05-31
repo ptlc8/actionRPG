@@ -2,10 +2,16 @@ package fr.actionrpg3d.render;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import org.lwjgl.opengl.Display;
+import java.io.File;
 
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
+
+import fr.actionrpg3d.Utils;
 import fr.actionrpg3d.game.Dungeon;
-import fr.actionrpg3d.game.RenderedGame;
+import fr.actionrpg3d.game.Game;
 import fr.actionrpg3d.game.Wave;
 import fr.actionrpg3d.game.collision.Prism;
 import fr.actionrpg3d.game.entities.Creature;
@@ -19,19 +25,80 @@ import fr.actionrpg3d.render.Model.Shape;
 
 public class Renderer {
 	
-	public static void renderGUI(RenderedGame rGame, Camera camera) {
+	private static int FRAME_CAP = 120;
+	private static boolean rendering = false;
+	private static int currentFps = 0;
+	
+	public static void init() {
+		System.setProperty("org.lwjgl.librarypath", new File("native/"+Utils.getOS()).getAbsolutePath());
+		System.setProperty("net.java.games.input.librarypath", new File("native/"+Utils.getOS()).getAbsolutePath());
+	}
+	
+	public static void start(Game game, Camera camera) throws LWJGLException, InterruptedException {
+		rendering = true;
+		
+		try {
+			Display.setDisplayMode(new DisplayMode(720, 480));
+			Display.setTitle("ActionRPG3D");
+			Display.setResizable(true);
+			Display.create();
+		} catch (LWJGLException e) {
+			e.printStackTrace();
+		}
+		
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE); // X-ray ?
+		
+		long lastUpdateFps = System.nanoTime();
+		int frames = 0;
+		while (rendering) {
+			if (Display.isCloseRequested()) rendering = false;
+			render(game, camera);
+			frames++;
+			if (System.nanoTime() - lastUpdateFps > 1_000_000_000) {
+				lastUpdateFps = System.nanoTime();
+				currentFps = frames;
+				frames = 0;
+			}
+			Thread.sleep((int)(1000.0/FRAME_CAP));
+		}
+		Display.destroy();
+	}
+	
+	public static void stop() {
+		rendering = false;
+	}
+	
+	public static void render(Game game, Camera camera) {
+		if (Display.wasResized()) glViewport(0, 0, Display.getWidth(), Display.getHeight());
+		GL11.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		GL11.glLoadIdentity();
+		Renderer.renderGUI(game, camera);
+		camera.getPerspectiveProjection();
+		camera.render();
+		Renderer.renderGame(game, camera);
+		Display.update();
+	}
+	
+	public static int getFps() {
+		return currentFps;
+	}
+	
+	public static void renderGUI(Game game, Camera camera) {
 		float aspect = (float)Display.getWidth()/(float)Display.getHeight();
-		Wave wave = rGame.getGame().getCurrentWave();
+		Wave wave = game.getCurrentWave();
 		if (wave != null)
 			renderWaveBar(wave.size()*1f/wave.getInitialSize(), aspect);
 		if (camera instanceof FirstPersonCamera || camera instanceof ThirdPersonCamera) {
 			Creature creature = camera instanceof FirstPersonCamera ? ((FirstPersonCamera)camera).getFollowed() : ((ThirdPersonCamera)camera).getFollowed();
-			float health = (float) creature.getHealth() / creature.getMaxHealth();
-			renderPlayerHealth(health, aspect);
-			/*if (creature instanceof Player) {
-				float cooldown = (float) ((Player)creature).getCooldown() / ((Player)creature).getWeapon().getCooldown();
-				renderPlayerCooldown(cooldown, aspect);
-			}*/
+			if (creature != null) {
+				float health = (float) creature.getHealth() / creature.getMaxHealth();
+				renderPlayerHealth(health, aspect);
+				/*if (creature instanceof Player) {
+					float cooldown = (float) ((Player)creature).getCooldown() / ((Player)creature).getWeapon().getCooldown();
+					renderPlayerCooldown(cooldown, aspect);
+				}*/
+			}
 			glColor3f(.7f, .7f, .7f); // blanc cassé
 			glBegin(GL_LINES);
 			glVertex2f(-.02f, 0);
@@ -98,13 +165,14 @@ public class Renderer {
 		glEnd();
 	}
 	
-	public static void render(RenderedGame rGame) {
+	public static void renderGame(Game game, Camera camera) {
 		
-		for (Entity entity : rGame.getGame().getEntities()) {
+		for (int i = 0; i < game.getEntities().size(); i++) {
+			Entity entity = game.getEntities().get(i);
 			if (entity instanceof Modelizable) {
-				if (!(rGame.getCamera() instanceof FirstPersonCamera && ((FirstPersonCamera)rGame.getCamera()).getFollowed()==entity))
+				if (!(camera instanceof FirstPersonCamera && ((FirstPersonCamera)camera).getFollowed()==entity))
 					render(((Modelizable)entity).getModel(), entity.getPosition(), ((Modelizable)entity).getRotation());
-				if (rGame.isDebug() && entity instanceof Tangible)
+				if (game.isDebug() && entity instanceof Tangible)
 					render(((Tangible)entity).getHitbox(), entity.getPosition());
 				if (entity instanceof Player && ((Player)entity).getWeapon()!=null) {
 					Player player = (Player)entity;
@@ -113,7 +181,7 @@ public class Renderer {
 			}
 		}		
 		
-		int [][] map = rGame.getGame().getDungeon().getPattern();
+		int [][] map = game.getDungeon().getPattern();
 		for(int i = 0; i < map.length; i++) {
 			for (int j = 0; j < map[i].length; j++) {
 				renderTile(j, i, map[i][j], i>=map.length-1?0:map[i+1][j], j>=(map.length==0?0:map[0].length-1)?0:map[i][j+1], i<=0?0:map[i-1][j], j<=0?0:map[i][j-1]);
