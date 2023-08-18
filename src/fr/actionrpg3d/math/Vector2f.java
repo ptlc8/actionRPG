@@ -1,7 +1,10 @@
 package fr.actionrpg3d.math;
 
-public class Vector2f {
+import java.io.Serializable;
+
+public class Vector2f implements Cloneable, Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	private float x, y;
 	
 	public Vector2f() {
@@ -116,6 +119,7 @@ public class Vector2f {
 		return x == 0 && y == 0;
 	}
 	
+	@Override
 	public Vector2f clone() {
 		return new Vector2f(x, y);
 	}

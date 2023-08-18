@@ -11,13 +11,13 @@ import org.lwjgl.input.Controllers;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import fr.actionrpg3d.client.ClientGameManager;
-import fr.actionrpg3d.client.SocketClient;
 import fr.actionrpg3d.game.Controls;
 import fr.actionrpg3d.game.Game;
 import fr.actionrpg3d.inputs.InputName;
 import fr.actionrpg3d.inputs.PhysicInput;
 import fr.actionrpg3d.inputs.PhysicInputsSource;
+import fr.actionrpg3d.multiplayer.ClientGameManager;
+import fr.actionrpg3d.multiplayer.SocketClient;
 import fr.actionrpg3d.render.Camera;
 import fr.actionrpg3d.render.FirstPersonCamera;
 import fr.actionrpg3d.render.Renderer;
@@ -31,13 +31,18 @@ public class Client {
 	private PhysicInputsSource inputsSource;
 	HashMap<InputName, Float> lastInputsStates = new HashMap<>();
 	private SocketClient socket;
-
+	
+	private boolean echaped = false; // is the cursor free
 	private boolean echaping = false; // the echap key was pressed or not, maybe temporary
+	private boolean gui = true;
 
-	public Client() throws Exception {
-		Renderer.init();
-		Controllers.create();
-		PhysicInput.refreshControllerIndex();
+	public Client(boolean nogui) throws Exception {
+		this.gui = !nogui;
+		if (gui) {
+			Renderer.init();
+			Controllers.create();
+			PhysicInput.refreshControllerIndex();
+		}
 		this.inputsSource = new PhysicInputsSource(new File("controls"));
 		for (InputName name : InputName.values())
 			lastInputsStates.put(name, 0f);
@@ -46,6 +51,10 @@ public class Client {
 		//camera = new ThirdPersonCamera(new Vector3f(0, 8, 0));
 		//camera = new FreeCamera(new Vector3f(0, -5, 0));
 		camera.setPerspectiveProjection(70f, 0.1f, 100f);
+	}
+	
+	public Client() throws Exception {
+		this(false);
 	}
 
 	public void enableCLI() {
@@ -71,12 +80,12 @@ public class Client {
 	}
 
 	private void onServerResponse(String data) {
-		System.out.println("Server : " + data);
+		//System.out.println("Server : " + data);
 		String[] args = data.split(" ");
 		if ("self".equals(args[0]))
 			selfId = Utils.parseInt(args[1]);
 		if ("initgame".equals(args[0])) {
-			startGame(new ClientGameManager(new Game(Utils.parseInt(args[1])), socket));
+			startGame(new ClientGameManager(Game.fromBase64(data.replaceFirst("initgame ", "")), socket));
 		}
 	}
 
@@ -86,13 +95,8 @@ public class Client {
 			game.getGame().setDebug(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL));
 			if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && !echaping) {
 				echaping = true;
-				if (game.getGame().isPaused()) {
-					game.getGame().resume();
-					Mouse.setGrabbed(true);
-				} else {
-					game.getGame().pause();
-					Mouse.setGrabbed(false);
-				}
+				echaped = !echaped;
+				Mouse.setGrabbed(echaped);
 			} else if (echaping && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
 				echaping = false;
 			}
@@ -125,13 +129,15 @@ public class Client {
 			((ThirdPersonCamera)camera).setFollowed(game.getGame().getPlayers().get(selfId));
 		
 		game.startUpdateLoop();
-		new Thread(() -> {
-			try {
-				Renderer.start(game.getGame(), camera);
-			} catch (LWJGLException | InterruptedException e) {
-				e.printStackTrace();
-			}
-		}, "Render").start();
+		if (gui) {
+			new Thread(() -> {
+				try {
+					Renderer.start(game.getGame(), camera);
+				} catch (LWJGLException | InterruptedException e) {
+					e.printStackTrace();
+				}
+			}, "Render").start();
+		}
 	}
 	
 	public GameManager getGameManager() {

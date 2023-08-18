@@ -1,7 +1,10 @@
 package fr.actionrpg3d.math;
 
-public class Vector3f implements Cloneable {
+import java.io.Serializable;
+
+public class Vector3f implements Cloneable, Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	private float x, y, z;
 	
 	public Vector3f() {
@@ -105,6 +108,7 @@ public class Vector3f implements Cloneable {
 		return new Vector2f(x, z);
 	}
 	
+	@Override
 	public Vector3f clone() {
 		return new Vector3f(x, y, z);
 	}

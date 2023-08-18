@@ -1,9 +1,9 @@
 package fr.actionrpg3d.game.entities;
 
-import java.util.List;
+import fr.actionrpg3d.game.Game;
 
 public interface AI extends Moveable {
 	
-	void updateAI(List<Entity> entities);
+	void updateAI(Game game);
 	
 }

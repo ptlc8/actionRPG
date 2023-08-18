@@ -7,38 +7,54 @@ import fr.actionrpg3d.game.collision.Shape;
 import fr.actionrpg3d.game.items.InfightWeapon;
 import fr.actionrpg3d.game.items.Weapon;
 import fr.actionrpg3d.math.Vector3f;
-import fr.actionrpg3d.render.Model;
 
 public class Player extends Creature implements FirstPersonControlable {
 	
+	private static final long serialVersionUID = 1L;
 	private static final float speedValue = 0.02f;
 	private static final int health = 100;
 	private static final Prism hitbox = new Prism(new Shape.RegularPolygon(8, .5f), 2);
-	private static final Weapon defaultWeapon = new InfightWeapon(new Model("/models/stick.model"), 2, 10, 60, 0.5f);
+	private static final Weapon defaultWeapon = new InfightWeapon("stick", 2, 10, 60, 0.5f);
 	
 	private int playerId;
 	private Weapon weapon = defaultWeapon; // @NonNullable
 	private int cooldown = 0;
 	
-	public Player(Game game, int playerId, Vector3f position, Model model) {
-		super(game, position, model, hitbox, health);
+	public Player(int entityId, int playerId, Vector3f position, String model) {
+		super(entityId, position, model, hitbox, health);
 		this.playerId = playerId;
 	}
 	
-	private void attack() {
+	public Player(Player original) {
+		super(original);
+		this.playerId = original.playerId;
+		this.weapon = original.weapon;
+		this.cooldown = original.cooldown;
+	}
+	
+	private void attack(Game game) {
 		if (cooldown >= weapon.getCooldown()) {
-			weapon.attack(this, getGame(), getPosition(), new Vector3f(0, 0, 1).rotate(getRotation()));
+			weapon.attack(this, game, getPosition(), new Vector3f(0, 0, 1).rotate(getRotation()));
 			cooldown = 0;
 		}
 	}
 	
 	@Override
-	public void updateControlable(Controls controls) {
+	public void updateControlable(Game game, Controls controls) {
 		FirstPersonControlable.super.updateControlable(controls);
 		if (cooldown < weapon.getCooldown()) cooldown++;
 		if (controls.getAction()) {
-			attack();
+			attack(game);
 		}
+	}
+	
+	@Override
+	public Entity clone() {
+		return new Player(this);
+	}
+	
+	public int getPlayerId() {
+		return playerId;
 	}
 	
 	@Override

@@ -194,7 +194,7 @@ public class Renderer {
 			glColor3f(shape.getColor().getX(), shape.getColor().getY(), shape.getColor().getZ());
 			glBegin(GL_POLYGON);
 			for (Vector3f vertex : shape.getVectors()) {
-				Vector3f v = new Vector3f(vertex).rotate(rot);
+				Vector3f v = new Vector3f(vertex).rotate(rot.clone().setX(0).setZ(0)); // TODO: only rotate y for now ?
 				glVertex3f(pos.getX()+v.getX(), pos.getY()+v.getY(), pos.getZ()+v.getZ());
 			}
 			glEnd();

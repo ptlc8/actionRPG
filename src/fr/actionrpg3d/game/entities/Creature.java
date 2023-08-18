@@ -7,7 +7,9 @@ import fr.actionrpg3d.render.Model;
 
 public abstract class Creature extends Entity implements Moveable, Modelizable, Tangible, Gravity {
 	
-	private Model model;
+	private static final long serialVersionUID = 1L;
+	
+	private String model;
 	private Vector3f rotation;
 	private Vector3f speed;
 	private Vector3f acceleration;
@@ -17,8 +19,8 @@ public abstract class Creature extends Entity implements Moveable, Modelizable, 
 	private final int maxHealth;
 	private int health;
 	
-	public Creature(Game game, Vector3f position, Model model, Prism hitbox, int health) {
-		super(game, position);
+	public Creature(int id, Vector3f position, String model, Prism hitbox, int health) {
+		super(id, position);
 		this.model = model;
 		this.hitbox = hitbox;
 		rotation = new Vector3f();
@@ -26,12 +28,22 @@ public abstract class Creature extends Entity implements Moveable, Modelizable, 
 		acceleration = new Vector3f();
 		this.health = this.maxHealth = health;
 	}
+	
+	public Creature(Creature original) {
+		super(original);
+		model = original.model;
+		rotation = original.rotation.clone();
+		speed = original.speed.clone();
+		acceleration = original.acceleration.clone();
+		hitbox = original.hitbox;
+		maxHealth = original.maxHealth;
+		health = original.health;
+	}
 
 	@Override
 	public Model getModel() {
-		return model;
+		return Model.get(model);
 	}
-
 	
 	@Override
 	public Vector3f getRotation() {
@@ -71,14 +83,14 @@ public abstract class Creature extends Entity implements Moveable, Modelizable, 
 		return health;
 	}
 	
-	public int takeDamage(int damage) {
+	public int takeDamage(Game game, int damage) {
 		health -= damage;
-		onTakeDamage(damage);
-		if (health <= 0) onDeath();
+		onTakeDamage(game, damage);
+		if (health <= 0) onDeath(game);
 		return damage;
 	}
 	
-	void onTakeDamage(int damage) {}
+	void onTakeDamage(Game game, int damage) {}
 	
 	public int heal(int heal) {
 		health = Math.min(health+heal, maxHealth);
@@ -88,8 +100,8 @@ public abstract class Creature extends Entity implements Moveable, Modelizable, 
 	
 	void onHeal(int heal) {}
 	
-	void onDeath() {
-		//getGame().getEntities().remove(this); TODO : sync
+	void onDeath(Game game) {
+		game.removeEntity(this);
 	}
 	
 }

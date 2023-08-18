@@ -1,20 +1,24 @@
 package fr.actionrpg3d.game.entities;
 
-import fr.actionrpg3d.game.Game;
+import java.io.Serializable;
+
 import fr.actionrpg3d.math.Vector3f;
 
-public abstract class Entity {
+public abstract class Entity implements Cloneable, Serializable {
 	
-	private static int kId = 0;
+	private static final long serialVersionUID = 1L;
 
 	private final int id;
-	private final Game game;
 	private Vector3f position;
 	
-	public Entity(Game game, Vector3f position) {
-		this.id = kId++;
-		this.game = game;
+	public Entity(int id, Vector3f position) {
+		this.id = id;
 		this.position = position;
+	}
+	
+	public Entity(Entity original) {
+		this.id = original.id;
+		this.position = original.position.clone();
 	}
 	
 	@Override
@@ -22,8 +26,15 @@ public abstract class Entity {
 		return id;
 	}
 	
-	public Game getGame() {
-		return game;
+	@Override
+	public boolean equals(Object obj) {
+		return this == obj || (obj instanceof Entity && ((Entity) obj).id == id);
+	}
+	
+	public abstract Entity clone();
+	
+	public int getId() {
+		return id;
 	}
 	
 	public Vector3f getPosition() {

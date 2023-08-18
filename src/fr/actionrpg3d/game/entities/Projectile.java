@@ -1,21 +1,22 @@
 package fr.actionrpg3d.game.entities;
 
-import fr.actionrpg3d.game.Game;
 import fr.actionrpg3d.game.collision.Prism;
 import fr.actionrpg3d.math.Vector3f;
 import fr.actionrpg3d.render.Model;
 
 public class Projectile extends Entity implements Modelizable, Gravity, Tangible {
 
+	private static final long serialVersionUID = 1L;
+	
 	private Prism hitbox;
-	private Model model;
+	private String model;
 	private Vector3f friction;
 	private Vector3f rotation;
 	private Vector3f speed;
 	private Vector3f acceleration;
 	
-	public Projectile(Game game, Vector3f position, Prism hitbox, Model model, Vector3f friction, Vector3f acceleration) {
-		super(game, position);
+	public Projectile(int id, Vector3f position, Prism hitbox, String model, Vector3f friction, Vector3f acceleration) {
+		super(id, position);
 		this.hitbox = hitbox;
 		this.model = model;
 		this.friction = friction;
@@ -24,10 +25,24 @@ public class Projectile extends Entity implements Modelizable, Gravity, Tangible
 		this.acceleration = acceleration;
 	}
 	
+	public Projectile(Projectile original) {
+		super(original);
+		this.hitbox = original.hitbox;
+		this.model = original.model;
+		this.friction = original.friction.clone();
+		this.rotation = original.rotation.clone();
+		this.speed = original.speed.clone();
+		this.acceleration = original.acceleration.clone();
+	}
+	
+	@Override
+	public Entity clone() {
+		return new Projectile(this);
+	}
 
 	@Override
 	public Model getModel() {
-		return model;
+		return Model.get(model);
 	}
 
 	@Override

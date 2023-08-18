@@ -1,13 +1,12 @@
 package fr.actionrpg3d.game.entities;
 
-import java.util.List;
-
 import fr.actionrpg3d.game.Game;
 import fr.actionrpg3d.game.collision.Prism;
 import fr.actionrpg3d.math.Vector3f;
-import fr.actionrpg3d.render.Model;
 
 public abstract class Enemy extends Creature implements AI {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private float speedValue;
 	private int sight;
@@ -18,8 +17,8 @@ public abstract class Enemy extends Creature implements AI {
 	
 	private float direction = 0;
 	
-	public Enemy(Game game, Vector3f position, Model model, Prism hitbox, int health, float speed, int sight, int reach, int maxReach, int cooldown) {
-		super(game, position, model, hitbox, health);
+	public Enemy(int id, Vector3f position, String model, Prism hitbox, int health, float speed, int sight, int reach, int maxReach, int cooldown) {
+		super(id, position, model, hitbox, health);
 		this.speedValue = speed;
 		this.sight = sight;
 		this.reach = reach;
@@ -27,11 +26,23 @@ public abstract class Enemy extends Creature implements AI {
 		this.cooldown = this.cooldownMax = cooldown;
 	}
 	
-	public void updateAI(List<Entity> entities) {
+	public Enemy(Enemy original) {
+		super(original);
+		speedValue = original.speedValue;
+		sight = original.sight;
+		reach = original.reach;
+		maxReach = original.maxReach;
+		cooldownMax = original.cooldownMax;
+		cooldown = original.cooldown;
+		direction = original.direction;
+	}
+	
+	@Override
+	public void updateAI(Game game) {
 		if (cooldown < cooldownMax) cooldown++;
 		float distanceNearestEntity = Float.MAX_VALUE;
 		Creature nearestEntity = null;
-		for (Entity entity : entities) {
+		for (Entity entity : game.getEntities().values()) {
 			if (entity instanceof Player) {// TODO : playerTeam interface
 				float distance = entity.getPosition().clone().sub(getPosition()).length();
 				if (distance < distanceNearestEntity) {
@@ -49,7 +60,7 @@ public abstract class Enemy extends Creature implements AI {
 				goBack(nearestEntity);
 			} else {
 				if (canAttack())
-					attack(nearestEntity);
+					attack(game, nearestEntity);
 			}
 		}
 	}
@@ -66,7 +77,7 @@ public abstract class Enemy extends Creature implements AI {
 		getRotation().setY((float)Math.toDegrees(direction));
 	}
 	
-	void attack(Creature target) {
+	void attack(Game game, Creature target) {
 		direction = (float) Math.atan2(target.getPosition().getX()-getPosition().getX(), target.getPosition().getZ()-getPosition().getZ());
 		getRotation().setY((float)Math.toDegrees(direction));
 		// TODO : no default attack ?

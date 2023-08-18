@@ -6,13 +6,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import fr.actionrpg3d.math.Vector3f;
 
 public class Model {
 	
-	// TODO : private static HashMap<String, Model> models;
+	private static HashMap<String, Model> models = new HashMap<>();
+	
+	public static Model get(String modelName) {
+		if (!models.containsKey(modelName))
+			models.put(modelName, new Model("/models/" + modelName + ".model"));
+		return models.get(modelName);
+	}
 	
 	private List<Shape> shapes;
 	

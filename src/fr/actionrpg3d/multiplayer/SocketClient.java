@@ -1,4 +1,4 @@
-package fr.actionrpg3d.client;
+package fr.actionrpg3d.multiplayer;
 
 import java.io.BufferedReader;
 import java.io.IOException;

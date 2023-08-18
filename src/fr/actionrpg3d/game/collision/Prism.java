@@ -1,6 +1,10 @@
 package fr.actionrpg3d.game.collision;
 
-public class Prism {
+import java.io.Serializable;
+
+public class Prism implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private Shape shape;
 	private float height;

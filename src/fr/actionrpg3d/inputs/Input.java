@@ -1,13 +1,6 @@
-package fr.actionrpg3d;
+package fr.actionrpg3d.inputs;
 
-import fr.actionrpg3d.inputs.InputName;
-
-public class Input {
-	
-	/*public static Input unserialize() {
-		
-		return new Input(id, tick, player, action);
-	}*/
+public class Input implements Comparable<Input> {
 	
 	private int id;
 	private int tick;
@@ -23,10 +16,6 @@ public class Input {
 		this.value = value;
 	}
 	
-	public String serialize() {
-		return id+" "+tick+" "+player+" "+inputName.getName();
-	}
-	
 	public int getId() {
 		return id;
 	}
@@ -34,6 +23,19 @@ public class Input {
 	@Override
 	public int hashCode() {
 		return id;
+	}
+
+	@Override
+	public int compareTo(Input o) {
+		return id - o.id;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) return true;
+		if (!(obj instanceof Input)) return false;
+		Input other = (Input) obj;
+		return other.id == id && other.tick == tick && other.player == player && other.inputName == inputName && other.value == value;
 	}
 	
 	public int getTick() {
