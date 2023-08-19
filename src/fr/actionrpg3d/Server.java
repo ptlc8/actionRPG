@@ -11,8 +11,8 @@ public class Server {
 	private SocketServer server;
 	private ServerGameManager game;
 
-	public Server() throws IOException {
-		server = new SocketServer(13028, 10);
+	public Server(String hostname) throws IOException {
+		server = new SocketServer(13028, 10, hostname);
 		server.addCloseListener(() -> System.out.println("Server closed"));
 		server.addJoinListener(this::onJoin);
 		server.addDataListener(this::onData);
@@ -20,6 +20,10 @@ public class Server {
 		game = new ServerGameManager(new Game(-1984888624), server);
 		System.out.println("Server started on " + server.getLocalPort());
 		game.startUpdateLoop();
+	}
+	
+	public Server() throws IOException {
+		this("localhost");
 	}
 	
 	public void onJoin(int id) {

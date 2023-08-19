@@ -66,12 +66,16 @@ public class Client {
 		}).start();
 	}
 	
-	public void joinServer() throws IOException {
+	public void joinServer(String hostname) throws IOException {
 		this.socket = new SocketClient();
 		socket.addDataListener(this::onServerResponse);
 		socket.addCloseListener(() -> System.out.println("Disconnected from server"));
-		socket.connect(13028);
+		socket.connect(hostname, 13028);
 		System.out.println("Connected to server");
+	}
+	
+	public void joinServer() throws IOException {
+		joinServer("localhost");
 	}
 	
 	public void joinSolo() {

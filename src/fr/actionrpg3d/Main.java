@@ -14,12 +14,17 @@ public class Main {
 		System.out.println("2: client");
 		System.out.println("3: server");
 		int choice = new Scanner(System.in).nextInt();
-		if (choice == 1)
+		if (choice == 1) {
 			new Client().joinSolo();
-		if (choice == 2)
-			new Client().joinServer();
-		if (choice == 3)
-			new Server();
+		} else if (choice == 2) {
+			System.out.println("Hostname ?");
+			String hostname = new Scanner(System.in).nextLine();
+			new Client().joinServer(hostname.length() == 0 ? "localhost" : hostname);
+		} else if (choice == 3) {
+			System.out.println("Hostname ?");
+			String hostname = new Scanner(System.in).nextLine();
+			new Server(hostname.length() == 0 ? "localhost" : hostname);
+		}
 	}
 
 }
